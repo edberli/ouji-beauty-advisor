@@ -397,6 +397,24 @@
 <script>
 let selectedSkinTypes=new Set(),selectedConcerns=new Set(),selectedMode=null,selectedCategory=null,searchQuery='',filterBrand='',currentStep=1,displayedProducts=[],currentPage=1,allFilteredProducts=[],routineBrand='';
 const PAGE_SIZE=10;
+const VALID_BRANDS=new Set([
+  'ROUND LAB','SKINFOOD','SKIN1004','SOME BY MI','Abib','ANUA','COSRX','mixsoon','Torriden',
+  'beplain','VT','ma:nyo','Arencia','NEEDLY','APRILSKIN','FRUDIA','PURITO','Lindsay',
+  'Numbuzin','OOTD','GOODAL','MENOKIN','Beauty of Joseon','W.DRESSROOM','Akaran','TIRTIR',
+  'TOCOBO','AGARISM','Acnes Labo','Chwi','NIVEA','SUNGBOON EDITOR','AHC','AXIS-Y',
+  'Derma:B','Dr.Melaxin','FANCL','Haruharu','KSECRET','MEDIHEAL','Whoo','Country & Stream',
+  'DHC','Farmstay','It\'s Skin','NACIFIC','ROSETTE','aromatica','Kose','Dasique','dotbye',
+  'Dr.Jart+','FAITH IN FACE','Fation','K-SECRET','MINON','Mandom','NARD','O HUI','OHORA',
+  'Pyunkang Yul','SNP','Su:m37','Utena','WONJIN','oganacell','AN\'BLESS','Amuse',
+  'CURESYS','Dr.G','Innisfree','JM','Mary&May','NatuLaka','OMI','SAVON','TSUBAKI',
+  'Yuskin','ilso','DIAPIA','DUO','Curel','Rejuran','Rohto','Shiseido','ANESSA','ATOPALM',
+  'd\'Alba','Wellage','QUALITY FIRST','ariul','Evian','PATCHIFY','BOTANIST','Olay',
+  'MediFlower','Pelican','Suncut','Naris','KAO','SILCOT','Unicharm','AFC','GRN',
+  'PRIVACY','UL.OS','YOLU','plu','Skinnylab','WELLIT','numbuz:n','MONDOM','3eemy',
+  'COSMETEX','JA HWANG SU','Sudee','Hello','Pintup','GREEN','ST','Marna',
+  'S.Nature','hetras','whipped','DoDoMe','Gastby','Country','WHITE','OVERLAY',
+  'C-ROLAND','DR','SKIN','QUALITY','illiyoon'
+]);
 
 const SKIN_TYPES=[
   {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'💧'},
@@ -553,7 +571,7 @@ function getMatching(cat,extra){
 }
 
 function getBrands(products){
-  const b={};products.forEach(p=>{b[p.brand]=(b[p.brand]||0)+1});
+  const b={};products.forEach(p=>{if(VALID_BRANDS.has(p.brand))b[p.brand]=(b[p.brand]||0)+1});
   return Object.entries(b).sort((a,b)=>b[1]-a[1]);
 }
 
@@ -721,7 +739,7 @@ function renderSingle(c){
 function getRoutineBrands(){
   const b={};
   ROUTINE_STEPS.forEach(step=>{
-    getMatching(step.category,step.extraCategory).forEach(p=>{b[p.brand]=(b[p.brand]||0)+1});
+    getMatching(step.category,step.extraCategory).forEach(p=>{if(VALID_BRANDS.has(p.brand))b[p.brand]=(b[p.brand]||0)+1});
   });
   return Object.entries(b).sort((a,b)=>b[1]-a[1]);
 }
