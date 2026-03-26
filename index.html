@@ -395,7 +395,7 @@
 <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-let selectedSkinTypes=new Set(),selectedConcerns=new Set(),selectedMode=null,selectedCategory=null,searchQuery='',filterBrand='',currentStep=1,displayedProducts=[],currentPage=1,allFilteredProducts=[];
+let selectedSkinTypes=new Set(),selectedConcerns=new Set(),selectedMode=null,selectedCategory=null,searchQuery='',filterBrand='',currentStep=1,displayedProducts=[],currentPage=1,allFilteredProducts=[],routineBrand='';
 const PAGE_SIZE=10;
 
 const SKIN_TYPES=[
@@ -507,7 +507,7 @@ function pickCat(id){
 }
 
 function goToStep(s){
-  currentStep=s;searchQuery='';filterBrand='';
+  currentStep=s;searchQuery='';filterBrand='';routineBrand='';
   [1,2,3].forEach(i=>{
     const el=document.getElementById('sv'+i);
     el.classList.toggle('active',i===s);
@@ -718,30 +718,58 @@ function renderSingle(c){
   renderPage();
 }
 
+function getRoutineBrands(){
+  const b={};
+  ROUTINE_STEPS.forEach(step=>{
+    getMatching(step.category,step.extraCategory).forEach(p=>{b[p.brand]=(b[p.brand]||0)+1});
+  });
+  return Object.entries(b).sort((a,b)=>b[1]-a[1]);
+}
+
 function renderRoutine(c){
   const skins=[...selectedSkinTypes].map(id=>SKIN_TYPES.find(s=>s.id===id)?.label).filter(Boolean);
   const cns=[...selectedConcerns].map(id=>CONCERNS.find(x=>x.id===id)?.label).filter(Boolean);
   const sub=cns.length?`${skins.join('、')} · ${cns.join('、')}`:skins.join('、');
+  const brands=getRoutineBrands();
   let h=`
     <div class="result-hero">
       <div class="sec-label">你的專屬方案</div>
       <h2 class="sec-title">護膚流程推薦</h2>
       <div class="result-badge"><span class="dot"></span>${sub}</div>
-    </div>${buildSummary()}${genSkinAnalysis()}`;
+    </div>${buildSummary()}${genSkinAnalysis()}
+    <div class="filter-bar">
+      <label>品牌篩選</label>
+      <select class="filter-select" id="routineBrandFilter" onchange="filterRoutineBrand(this.value)" style="flex:1;min-width:180px">
+        <option value="">所有品牌（顯示最佳配對）</option>
+        ${brands.map(([b,n])=>`<option value="${b}"${routineBrand===b?' selected':''}>${b} (${n})</option>`).join('')}
+      </select>
+      ${routineBrand?`<button class="btn btn-ghost" style="padding:.35rem .75rem;font-size:.7rem" onclick="filterRoutineBrand('')">清除篩選</button>`:''}
+    </div>`;
+  let hasProducts=false;
   ROUTINE_STEPS.forEach((step,idx)=>{
-    const products=getMatching(step.category,step.extraCategory);
+    let products=getMatching(step.category,step.extraCategory);
+    if(routineBrand)products=products.filter(p=>p.brand===routineBrand);
     const top=products.slice(0,4);
-    if(!top.length)return;
-    h+=`<div class="routine-block" id="rb${step.step}">
+    const empty=!top.length;
+    h+=`<div class="routine-block${empty?' routine-empty':''}" id="rb${step.step}">
       <div class="routine-head" onclick="toggleBlock(${step.step})">
         <div class="routine-num">${step.step}</div>
         <div class="routine-info"><div class="routine-title">${step.title}</div><div class="routine-desc">${step.desc}</div></div>
         <span class="routine-arrow">▼</span>
       </div>
-      <div class="routine-products"><div class="p-grid">${renderCards(top)}</div></div>
+      <div class="routine-products">${empty
+        ?`<div style="padding:.75rem 0;font-size:.75rem;color:var(--text3);text-align:center">${routineBrand} 暫無此類別產品</div>`
+        :`<div class="p-grid">${renderCards(top)}</div>`
+      }</div>
     </div>${idx<ROUTINE_STEPS.length-1?'<div class="routine-sep"></div>':''}`;
+    if(!empty)hasProducts=true;
   });
   c.innerHTML=h;
+}
+
+function filterRoutineBrand(b){
+  routineBrand=b;
+  renderRoutine(document.getElementById('results'));
 }
 
 function toggleBlock(s){document.getElementById('rb'+s).classList.toggle('collapsed')}
@@ -847,7 +875,7 @@ function switchTab(tab){
 }
 
 function resetAll(){
-  selectedSkinTypes.clear();selectedConcerns.clear();selectedMode=null;selectedCategory=null;searchQuery='';filterBrand='';
+  selectedSkinTypes.clear();selectedConcerns.clear();selectedMode=null;selectedCategory=null;searchQuery='';filterBrand='';routineBrand='';
   document.querySelectorAll('.skin-card,.concern-pill,.mode-card,.cat-chip').forEach(el=>el.classList.remove('selected'));
   document.getElementById('btn1').disabled=true;
   document.getElementById('btn2').disabled=true;
