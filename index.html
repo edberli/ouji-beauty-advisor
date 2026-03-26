@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OUJI Beauty Advisor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="products.js"></script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0c0a0e;--bg2:#151218;
+      --surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);--surface3:rgba(255,255,255,.1);
+      --glass-border:rgba(255,255,255,.08);
+      --text:#f5f0eb;--text2:rgba(255,255,255,.6);--text3:rgba(255,255,255,.35);
+      --gold:#c9a96e;--gold2:#e8d5a8;--gold-glow:rgba(201,169,110,.15);
+      --rose:#d4868c;--rose2:#e8a5aa;--lavender:#9b8ec4;--sage:#7dae82;--sky:#7ba7c2;
+      --radius:16px;--radius-lg:24px;
+      --ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(0,.55,.45,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter','Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+    /* AMBIENT */
+    .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .ambient-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.35;animation:orbFloat 20s ease-in-out infinite}
+    .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(201,169,110,.3),transparent 70%);top:-10%;left:-10%;animation-duration:25s}
+    .orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(155,142,196,.25),transparent 70%);top:40%;right:-10%;animation-duration:20s;animation-delay:-5s}
+    .orb3{width:350px;height:350px;background:radial-gradient(circle,rgba(212,134,140,.2),transparent 70%);bottom:-5%;left:30%;animation-duration:22s;animation-delay:-10s}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-20px,40px) scale(.95)}}
+    .noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
+
+    /* LAYOUT */
+    .wrap{position:relative;z-index:2}.container{max-width:860px;margin:0 auto;padding:0 1.5rem}
+
+    /* HEADER */
+    .header{padding:3.5rem 0 2rem;text-align:center}
+    .header-line{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.25rem}
+    .header h1{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;letter-spacing:.02em;background:linear-gradient(135deg,var(--gold2),var(--gold),var(--rose2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerText 4s ease-in-out infinite;background-size:200% 200%}
+    @keyframes shimmerText{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+    .header p{font-size:.88rem;color:var(--text2);margin-top:.5rem;font-weight:300;letter-spacing:.05em}
+
+    /* NAV */
+    .nav{display:flex;justify-content:center;gap:0;padding:.5rem;position:sticky;top:0;z-index:100;background:rgba(12,10,14,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--glass-border)}
+    .nav-btn{padding:.7rem 2rem;font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;position:relative;transition:color .3s;font-family:inherit}
+    .nav-btn:hover{color:var(--text2)}.nav-btn.active{color:var(--gold)}
+    .nav-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--gold);border-radius:1px}
+    .nav-btn.disabled{opacity:.25;cursor:not-allowed}
+
+    /* MAIN */
+    .main{padding:2rem 0 5rem}.page{display:none}.page.active{display:block}
+
+    /* PROGRESS */
+    .progress{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2.5rem}
+    .prog-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;border:1.5px solid var(--glass-border);background:var(--surface);color:var(--text3);transition:all .5s var(--ease);position:relative}
+    .prog-dot.active{border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px var(--gold-glow);animation:pulseGlow 2.5s ease-in-out infinite}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 20px var(--gold-glow)}50%{box-shadow:0 0 25px rgba(201,169,110,.25)}}
+    .prog-dot.done{border-color:var(--sage);color:var(--sage);background:rgba(125,174,130,.1)}
+    .prog-line{width:60px;height:1px;background:var(--glass-border);position:relative;overflow:hidden;transition:all .5s}
+    .prog-line.done{background:var(--sage)}
+    .prog-line.done::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(125,174,130,.5),transparent);animation:lineShine 2s ease-in-out infinite}
+    @keyframes lineShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+    /* SECTIONS */
+    .sec-label{font-size:.65rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:.5rem}
+    .sec-title{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:500;text-align:center;margin-bottom:.35rem;color:var(--text)}
+    .sec-desc{text-align:center;font-size:.82rem;color:var(--text3);margin-bottom:2rem;font-weight:300}
+
+    /* STEP TRANSITIONS */
+    .step-view{display:none}.step-view.active{display:block;animation:stepIn .6s var(--ease-out) both}
+    @keyframes stepIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+    /* SKIN TYPE CARDS */
+    .skin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:3rem}
+    .skin-card{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:1.25rem .75rem 1rem;text-align:center;cursor:pointer;transition:all .4s var(--ease);position:relative;overflow:hidden}
+    .skin-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,169,110,.08),rgba(155,142,196,.06));opacity:0;transition:opacity .4s}
+    .skin-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+    .skin-card:hover::before{opacity:1}
+    .skin-card.selected{border-color:var(--gold);box-shadow:0 0 30px var(--gold-glow),0 8px 32px rgba(0,0,0,.4)}
+    .skin-card.selected::before{opacity:1}
+    .skin-card.selected .skin-check{transform:scale(1);opacity:1}
+    .skin-check{position:absolute;top:.4rem;right:.4rem;width:18px;height:18px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;transform:scale(0);opacity:0;transition:all .35s var(--ease-spring)}
+    .skin-check svg{width:9px;height:9px}
+    .skin-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:1.1rem;background:var(--surface2);transition:transform .4s var(--ease-spring)}
+    .skin-card:hover .skin-icon{transform:scale(1.1)}
+    .skin-card.selected .skin-icon{background:var(--gold-glow);transform:scale(1.1)}
+    .skin-card .lbl{font-size:.75rem;font-weight:600;color:var(--text);margin-bottom:.15rem;position:relative}
+    .skin-card .dsc{font-size:.6rem;color:var(--text3);line-height:1.4;position:relative}
+
+    /* CONCERN PILLS */
+    .concern-wrap{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:1rem}
+    .concern-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:999px;border:1px solid var(--glass-border);background:var(--surface);font-size:.78rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .3s var(--ease);user-select:none}
+    .concern-pill:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-1px)}
+    .concern-pill.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 20px var(--gold-glow)}
+    .concern-pill .cdot{width:6px;height:6px;border-radius:50%;transition:all .3s}
+    .concern-pill.selected .cdot{background:var(--bg)!important}
+
+    /* MODE CARDS */
+    .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem}
+    .mode-card{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:2.25rem 1.5rem 1.75rem;text-align:center;cursor:pointer;transition:all .4s var(--ease);position:relative;overflow:hidden}
+    .mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--lavender));transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
+    .mode-card:hover{border-color:rgba(255,255,255,.12);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+    .mode-card:hover::before{transform:scaleX(1)}
+    .mode-card.selected{border-color:var(--gold);box-shadow:0 0 30px var(--gold-glow),0 12px 40px rgba(0,0,0,.3)}
+    .mode-card.selected::before{transform:scaleX(1)}
+    .mode-card.selected .mode-check{transform:scale(1);opacity:1}
+    .mode-check{position:absolute;top:.75rem;right:.75rem;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;transform:scale(0);opacity:0;transition:all .35s var(--ease-spring)}
+    .mode-check svg{width:10px;height:10px}
+    .mode-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto .85rem;font-size:1.4rem;background:var(--surface2);transition:all .4s var(--ease-spring)}
+    .mode-card:hover .mode-icon{transform:scale(1.08) rotate(-2deg)}
+    .mode-card .lbl{font-size:1rem;font-weight:600;margin-bottom:.3rem}
+    .mode-card .dsc{font-size:.78rem;color:var(--text3);line-height:1.5}
+
+    /* CAT CHIPS */
+    .cat-sec{margin-top:2rem}
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.4rem;margin-bottom:2rem}
+    .cat-chip{padding:.55rem .4rem;border-radius:var(--radius);border:1px solid var(--glass-border);background:var(--surface);text-align:center;cursor:pointer;font-size:.75rem;font-weight:500;color:var(--text2);transition:all .25s var(--ease)}
+    .cat-chip:hover{border-color:rgba(255,255,255,.15);background:var(--surface2)}
+    .cat-chip.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 16px var(--gold-glow)}
+    .cat-count{font-size:.6rem;color:var(--text3);margin-top:.15rem;display:block}
+    .cat-chip.selected .cat-count{color:rgba(0,0,0,.5)}
+
+    /* BUTTONS */
+    .btn-row{display:flex;gap:.75rem;justify-content:center;margin-top:2.5rem}
+    .btn{padding:.75rem 2.25rem;border-radius:999px;border:none;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .3s var(--ease);font-family:inherit;letter-spacing:.04em;position:relative;overflow:hidden}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),#b8955d);color:var(--bg);box-shadow:0 4px 20px var(--gold-glow)}
+    .btn-gold::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .3s}
+    .btn-gold:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,169,110,.3)}
+    .btn-gold:hover::after{opacity:1}
+    .btn-gold:disabled{opacity:.25;cursor:not-allowed;transform:none;box-shadow:none}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--glass-border)}
+    .btn-ghost:hover{border-color:rgba(255,255,255,.2);color:var(--text);background:var(--surface)}
+
+    /* RESULTS */
+    .result-hero{text-align:center;margin-bottom:2rem}
+    .result-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:999px;border:1px solid var(--glass-border);background:var(--surface);font-size:.78rem;color:var(--text2);margin-top:.75rem}
+    .result-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
+
+    /* FILTER BAR */
+    .filter-bar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;padding:.75rem;border-radius:var(--radius);background:var(--surface);border:1px solid var(--glass-border)}
+    .filter-bar label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+    .filter-select{padding:.35rem .6rem;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg2);font-size:.72rem;color:var(--text2);font-family:inherit;cursor:pointer;flex-shrink:0}
+    .search-box{position:relative;flex:1;min-width:180px}
+    .search-box svg{position:absolute;left:.65rem;top:50%;transform:translateY(-50%);color:var(--text3)}
+    .search-input{width:100%;padding:.5rem .65rem .5rem 2rem;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg2);font-size:.75rem;color:var(--text);font-family:inherit;transition:all .25s}
+    .search-input::placeholder{color:var(--text3)}
+    .search-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 12px var(--gold-glow)}
+
+    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--glass-border)}
+    .toolbar-count{font-size:.75rem;color:var(--text3)}.toolbar-count strong{color:var(--gold)}
+    .toolbar-sort{padding:.3rem .5rem;border-radius:8px;border:1px solid var(--glass-border);background:var(--surface);font-size:.7rem;color:var(--text2);font-family:inherit;cursor:pointer}
+
+    /* PRODUCT CARDS */
+    .p-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.65rem}
+    .p-card{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:1.15rem;display:flex;flex-direction:column;transition:all .4s var(--ease);position:relative;overflow:hidden;animation:cardReveal .5s var(--ease-out) both;cursor:pointer}
+    .p-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,169,110,.04),rgba(155,142,196,.03));opacity:0;transition:opacity .4s}
+    .p-card:hover{border-color:rgba(255,255,255,.12);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .p-card:hover::before{opacity:1}
+    .p-card:hover .p-desc{-webkit-line-clamp:unset}
+    @keyframes cardReveal{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .p-match{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:6px;font-size:.56rem;font-weight:700;letter-spacing:.05em;background:linear-gradient(135deg,var(--gold),#b8955d);color:var(--bg);margin-bottom:.4rem;text-transform:uppercase;box-shadow:0 2px 12px var(--gold-glow);width:fit-content}
+    .p-badges{display:flex;flex-wrap:wrap;gap:.2rem;margin-bottom:.35rem}
+    .p-badge{padding:.1rem .4rem;border-radius:5px;font-size:.56rem;font-weight:600}
+    .p-cat{padding:.1rem .45rem;border-radius:5px;font-size:.56rem;font-weight:600}
+    .p-brand{font-size:.65rem;color:var(--text3);margin-bottom:.2rem;font-weight:500}
+    .p-name{font-size:.82rem;font-weight:500;line-height:1.5;color:var(--text);position:relative}
+    .p-desc{font-size:.7rem;color:var(--text3);line-height:1.5;margin-top:.35rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .p-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:auto;padding-top:.6rem;border-top:1px solid var(--glass-border)}
+    .p-stock{font-size:.65rem;color:var(--text3);display:flex;align-items:center;gap:.25rem}
+    .p-dot{width:5px;height:5px;border-radius:50%;display:inline-block}
+    .p-dot.ok{background:var(--sage)}.p-dot.low{background:#d4a030}.p-dot.out{background:var(--rose)}
+    .p-why{font-size:.62rem;color:var(--gold);font-weight:500}
+
+    /* BADGE COLORS */
+    .bg-oil_control{background:rgba(123,167,194,.15);color:var(--sky)}
+    .bg-hydration{background:rgba(100,180,170,.15);color:#7ec4b8}
+    .bg-soothing{background:rgba(125,174,130,.15);color:var(--sage)}
+    .bg-brightening{background:rgba(212,134,140,.15);color:var(--rose2)}
+    .bg-anti_aging{background:rgba(155,142,196,.15);color:var(--lavender)}
+    .bg-acne{background:rgba(200,120,120,.15);color:#d08888}
+    .bg-pore{background:rgba(123,167,194,.12);color:var(--sky)}
+    .bg-dark_spots{background:rgba(201,169,110,.15);color:var(--gold2)}
+    .bg-fine_lines{background:rgba(155,142,196,.12);color:var(--lavender)}
+    .bg-redness{background:rgba(212,134,140,.12);color:var(--rose)}
+    .bg-dullness{background:rgba(220,200,100,.15);color:#c8b84a}
+    .bg-deep_clean{background:rgba(123,167,194,.12);color:var(--sky)}
+    .bg-general{background:var(--surface2);color:var(--text3)}
+    .pc-潔面{background:rgba(123,167,194,.15);color:var(--sky)}
+    .pc-卸妝{background:rgba(155,142,196,.15);color:var(--lavender)}
+    .pc-爽膚水{background:rgba(100,180,170,.15);color:#7ec4b8}
+    .pc-精華液{background:rgba(212,134,140,.15);color:var(--rose2)}
+    .pc-面霜{background:rgba(201,169,110,.15);color:var(--gold2)}
+    .pc-乳液{background:rgba(201,169,110,.12);color:var(--gold)}
+    .pc-面膜{background:rgba(125,174,130,.15);color:var(--sage)}
+    .pc-防曬{background:rgba(220,200,100,.15);color:#c8b84a}
+    .pc-眼部護理{background:rgba(155,142,196,.12);color:var(--lavender)}
+    .pc-去角質{background:rgba(212,134,140,.12);color:var(--rose)}
+    .pc-唇部護理{background:rgba(212,134,140,.15);color:var(--rose2)}
+    .pc-身體護理{background:rgba(125,174,130,.12);color:var(--sage)}
+    .pc-噴霧{background:rgba(100,180,170,.12);color:#7ec4b8}
+    .pc-其他{background:var(--surface2);color:var(--text3)}
+
+    /* SKIN ANALYSIS CARD */
+    .analysis-card{position:relative;margin-bottom:2rem;padding:1.75rem 1.5rem;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(155,142,196,.04),rgba(212,134,140,.03));border:1px solid rgba(201,169,110,.15);overflow:hidden;animation:analysisIn .8s var(--ease-out) both}
+    .analysis-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--lavender),var(--gold));background-size:200% 100%;animation:gradientSlide 4s linear infinite}
+    @keyframes gradientSlide{0%{background-position:0% 0}100%{background-position:200% 0}}
+    @keyframes analysisIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .analysis-icon{width:44px;height:44px;border-radius:14px;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.85rem;border:1px solid rgba(201,169,110,.15)}
+    .analysis-label{font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+    .analysis-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:.75rem}
+    .analysis-body{font-size:.8rem;color:var(--text2);line-height:1.85;margin-bottom:.75rem}
+    .analysis-body p{margin-bottom:.5rem}
+    .analysis-tips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+    .analysis-tip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:8px;font-size:.68rem;font-weight:500;background:var(--surface2);color:var(--text2);border:1px solid var(--glass-border)}
+
+    /* ROUTINE */
+    .routine-block{margin-bottom:1.5rem;position:relative}
+    .routine-head{display:flex;align-items:center;gap:.75rem;padding:.65rem 0;cursor:pointer;user-select:none;transition:opacity .3s}
+    .routine-head:hover{opacity:.8}
+    .routine-num{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#b8955d);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;box-shadow:0 4px 16px var(--gold-glow)}
+    .routine-info{flex:1}.routine-title{font-size:.88rem;font-weight:600;color:var(--text)}.routine-desc{font-size:.7rem;color:var(--text3)}
+    .routine-arrow{color:var(--text3);font-size:.7rem;transition:transform .3s var(--ease)}
+    .routine-block.collapsed .routine-arrow{transform:rotate(-90deg)}
+    .routine-block.collapsed .routine-products{max-height:0;opacity:0;overflow:hidden;margin-top:0}
+    .routine-products{max-height:2000px;opacity:1;transition:all .4s var(--ease);margin-top:.6rem}
+    .routine-sep{height:1px;margin:0 0 1.5rem 15px;background:linear-gradient(90deg,var(--glass-border),transparent 80%)}
+
+    /* PRODUCT DETAIL MODAL */
+    .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:1rem;animation:fadeIn .25s}
+    .modal-overlay.show{display:flex}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal{background:var(--bg2);border:1px solid var(--glass-border);border-radius:var(--radius-lg);max-width:480px;width:100%;padding:2rem;position:relative;animation:modalIn .35s var(--ease-out)}
+    @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .modal-close{position:absolute;top:.75rem;right:.75rem;width:30px;height:30px;border-radius:8px;border:1px solid var(--glass-border);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .2s}
+    .modal-close:hover{border-color:var(--gold);color:var(--gold)}
+    .modal-brand{font-size:.7rem;color:var(--gold);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+    .modal-name{font-size:1.1rem;font-weight:600;line-height:1.5;margin-bottom:.75rem}
+    .modal-desc{font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--glass-border)}
+    .modal-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
+    .modal-tag{padding:.2rem .55rem;border-radius:6px;font-size:.65rem;font-weight:600}
+    .modal-meta{display:flex;gap:1.25rem;font-size:.75rem;color:var(--text3)}
+    .modal-meta span{display:flex;align-items:center;gap:.3rem}
+    .modal-why{margin-top:1rem;padding:.65rem .85rem;border-radius:var(--radius);background:var(--gold-glow);border:1px solid rgba(201,169,110,.2);font-size:.75rem;color:var(--gold2);line-height:1.5}
+
+    /* SCROLL TOP */
+    .scroll-top{position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;border-radius:12px;background:var(--gold);color:var(--bg);border:none;font-size:.85rem;cursor:pointer;box-shadow:0 4px 20px var(--gold-glow);display:none;align-items:center;justify-content:center;transition:all .3s;z-index:50}
+    .scroll-top:hover{transform:translateY(-2px)}.scroll-top.show{display:flex}
+
+    /* FOOTER */
+    .footer{text-align:center;padding:2rem 1rem;font-size:.65rem;color:var(--text3);border-top:1px solid var(--glass-border)}
+
+    /* RESPONSIVE */
+    @media(max-width:640px){
+      .header h1{font-size:1.75rem}.header{padding:2.5rem 0 1.5rem}
+      .container{padding:0 1rem}
+      .skin-grid{grid-template-columns:repeat(2,1fr);gap:.45rem}
+      .skin-card{padding:.85rem .5rem .7rem}
+      .skin-icon{width:32px;height:32px;font-size:.9rem}
+      .skin-card .lbl{font-size:.68rem}.skin-card .dsc{font-size:.55rem}
+      .mode-grid{grid-template-columns:1fr}
+      .p-grid{grid-template-columns:1fr}
+      .concern-pill{padding:.4rem .75rem;font-size:.72rem}
+      .sec-title{font-size:1.35rem}
+      .cat-grid{grid-template-columns:repeat(3,1fr)}
+      .btn{padding:.65rem 1.5rem;font-size:.76rem}
+      .nav-btn{padding:.6rem 1rem;font-size:.7rem}
+      .filter-bar{flex-direction:column;align-items:stretch;gap:.4rem}
+      .filter-bar label{display:none}
+    }
+    /* PAGINATION */
+    .pagination{display:flex;justify-content:center;align-items:center;gap:.35rem;margin-top:1.5rem;flex-wrap:wrap}
+    .page-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--glass-border);background:var(--surface);color:var(--text2);font-size:.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s var(--ease);font-family:inherit}
+    .page-btn:hover{border-color:rgba(255,255,255,.15);background:var(--surface2)}
+    .page-btn.active{background:var(--gold);border-color:var(--gold);color:var(--bg);box-shadow:0 4px 16px var(--gold-glow)}
+    .page-btn.nav-arrow{width:auto;padding:0 .75rem;font-size:.7rem}
+    .page-btn:disabled{opacity:.2;cursor:not-allowed}
+    .page-dots{color:var(--text3);font-size:.75rem;padding:0 .25rem}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:all .6s var(--ease-out)}.reveal.visible{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body>
+
+<div class="ambient"><div class="ambient-orb orb1"></div><div class="ambient-orb orb2"></div><div class="ambient-orb orb3"></div></div>
+<div class="noise"></div>
+
+<div class="wrap">
+  <div class="header"><div class="container">
+    <div class="header-line"></div>
+    <h1>OUJI Beauty Advisor</h1>
+    <p>智能分析膚質，為你精選最合適的護膚品</p>
+  </div></div>
+
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchTab('skincare')">護膚品</button>
+    <button class="nav-btn disabled" onclick="return false">化妝品（即將推出）</button>
+  </nav>
+
+  <div class="main"><div class="container">
+    <div class="page active" id="page-skincare">
+      <div class="progress" id="progress">
+        <div class="prog-dot active" id="pd1"><span>1</span></div>
+        <div class="prog-line" id="pl1"></div>
+        <div class="prog-dot" id="pd2"><span>2</span></div>
+        <div class="prog-line" id="pl2"></div>
+        <div class="prog-dot" id="pd3"><span>3</span></div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-view active" id="sv1">
+        <div class="sec-label">Step 01</div>
+        <h2 class="sec-title">你的膚質是？</h2>
+        <p class="sec-desc">選擇最接近你肌膚狀況的類型（可多選）</p>
+        <div class="skin-grid" id="skin-grid"></div>
+
+        <div class="sec-label reveal">肌膚問題</div>
+        <h2 class="sec-title reveal" style="font-size:1.35rem">想改善什麼問題？</h2>
+        <p class="sec-desc reveal">可多選，幫助我們更精準推薦</p>
+        <div class="concern-wrap reveal" id="concern-wrap"></div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" id="btn1" disabled onclick="goToStep(2)">下一步</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-view" id="sv2">
+        <div class="sec-label">Step 02</div>
+        <h2 class="sec-title">選擇瀏覽方式</h2>
+        <p class="sec-desc">單獨選購或查看完整護膚流程</p>
+        <div class="mode-grid" id="mode-grid"></div>
+        <div id="cat-sec" class="cat-sec" style="display:none">
+          <div class="sec-label">選擇類別</div>
+          <div class="cat-grid" id="cat-grid"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep(1)">返回</button>
+          <button class="btn btn-gold" id="btn2" disabled onclick="goToStep(3)">查看推薦</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-view" id="sv3">
+        <div id="results"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep(2)">返回修改</button>
+          <button class="btn btn-ghost" onclick="resetAll()">重新開始</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-makeup">
+      <div style="text-align:center;padding:5rem 1rem">
+        <div style="font-size:2.5rem;margin-bottom:1rem">💄</div>
+        <h2 class="sec-title">化妝品推薦</h2>
+        <p class="sec-desc">即將推出，敬請期待</p>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="footer"><div class="container">OUJI Beauty Advisor &copy; 2026</div></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+let selectedSkinTypes=new Set(),selectedConcerns=new Set(),selectedMode=null,selectedCategory=null,searchQuery='',filterBrand='',currentStep=1,displayedProducts=[],currentPage=1,allFilteredProducts=[];
+const PAGE_SIZE=10;
+
+const SKIN_TYPES=[
+  {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'💧'},
+  {id:'dry',label:'乾性肌膚',desc:'容易乾燥、脫皮',icon:'🏜️'},
+  {id:'combination',label:'混合性肌膚',desc:'T字出油，面頰偏乾',icon:'⚖️'},
+  {id:'sensitive',label:'敏感肌膚',desc:'容易泛紅、刺激',icon:'🌸'},
+  {id:'acne_prone',label:'痘痘肌',desc:'容易長暗瘡粉刺',icon:'🔴'},
+  {id:'mature',label:'熟齡肌膚',desc:'出現鬆弛、皺紋',icon:'🌿'},
+  {id:'dull',label:'暗啞肌膚',desc:'膚色暗沉、缺乏光澤',icon:'✨'},
+  {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'🌟'},
+];
+const CONCERNS=[
+  {id:'oil_control',label:'控油',color:'var(--sky)'},
+  {id:'hydration',label:'保濕補水',color:'#7ec4b8'},
+  {id:'acne',label:'暗瘡痘痘',color:'#d08888'},
+  {id:'pore',label:'毛孔粗大',color:'var(--sky)'},
+  {id:'brightening',label:'美白提亮',color:'var(--rose)'},
+  {id:'dark_spots',label:'色斑痘印',color:'var(--gold)'},
+  {id:'fine_lines',label:'細紋皺紋',color:'var(--lavender)'},
+  {id:'anti_aging',label:'抗衰老緊緻',color:'var(--lavender)'},
+  {id:'soothing',label:'舒緩修護',color:'var(--sage)'},
+  {id:'redness',label:'泛紅敏感',color:'var(--rose)'},
+  {id:'dullness',label:'暗沉提亮',color:'#c8b84a'},
+  {id:'deep_clean',label:'深層清潔',color:'var(--sky)'},
+];
+const CONCERN_LABELS={oil_control:'控油',hydration:'保濕',soothing:'舒緩',brightening:'美白',anti_aging:'抗老',acne:'抗痘',pore:'毛孔',dark_spots:'淡斑',fine_lines:'抗皺',redness:'退紅',dullness:'提亮',deep_clean:'清潔',general:'通用'};
+const MODES=[
+  {id:'single',label:'單件產品',desc:'選擇一個產品類別，瀏覽合適的產品',icon:'🧴'},
+  {id:'routine',label:'整套護膚流程',desc:'根據你的膚質，推薦完整護膚步驟',icon:'📋'},
+];
+const ROUTINE_STEPS=[
+  {step:1,category:'卸妝',title:'卸妝',desc:'清除彩妝及防曬'},
+  {step:2,category:'潔面',title:'潔面',desc:'深層清潔肌膚'},
+  {step:3,category:'去角質',title:'去角質',desc:'去除老廢角質（每週1-2次）'},
+  {step:4,category:'爽膚水',title:'爽膚水',desc:'平衡pH值，準備後續護膚'},
+  {step:5,category:'精華液',title:'精華液',desc:'集中修護，針對肌膚問題'},
+  {step:6,category:'眼部護理',title:'眼部護理',desc:'滋潤眼周嬌嫩肌膚'},
+  {step:7,category:'面霜',title:'面霜 / 乳液',desc:'鎖住水分，滋潤保護',extraCategory:'乳液'},
+  {step:8,category:'防曬',title:'防曬（日間）',desc:'阻隔紫外線，預防光老化'},
+  {step:9,category:'面膜',title:'面膜（每週2-3次）',desc:'深層滋養修護'},
+];
+const CATS=[
+  {id:'卸妝',label:'卸妝'},{id:'潔面',label:'潔面'},{id:'去角質',label:'去角質'},
+  {id:'爽膚水',label:'爽膚水'},{id:'精華液',label:'精華液'},{id:'眼部護理',label:'眼部護理'},
+  {id:'面霜',label:'面霜'},{id:'乳液',label:'乳液'},{id:'面膜',label:'面膜'},
+  {id:'防曬',label:'防曬'},{id:'噴霧',label:'噴霧'},{id:'身體護理',label:'身體護理'},
+  {id:'唇部護理',label:'唇部護理'},{id:'其他',label:'其他'},
+];
+const CHK='<svg viewBox="0 0 12 12" fill="none" stroke="#0c0a0e" stroke-width="2.5"><path d="M2.5 6l2.5 2.5 4.5-4.5"/></svg>';
+
+function init(){
+  renderSkins();renderConcerns();renderModes();renderCats();
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+function renderSkins(){
+  document.getElementById('skin-grid').innerHTML=SKIN_TYPES.map(t=>`
+    <div class="skin-card" data-id="${t.id}" onclick="pickSkin('${t.id}')">
+      <div class="skin-check">${CHK}</div>
+      <div class="skin-icon">${t.icon}</div>
+      <div class="lbl">${t.label}</div>
+      <div class="dsc">${t.desc}</div>
+    </div>`).join('');
+}
+function renderConcerns(){
+  document.getElementById('concern-wrap').innerHTML=CONCERNS.map(c=>`
+    <div class="concern-pill" data-id="${c.id}" onclick="pickConcern('${c.id}')">
+      <span class="cdot" style="background:${c.color}"></span>${c.label}
+    </div>`).join('');
+}
+function renderModes(){
+  document.getElementById('mode-grid').innerHTML=MODES.map(m=>`
+    <div class="mode-card" data-id="${m.id}" onclick="pickMode('${m.id}')">
+      <div class="mode-check">${CHK}</div>
+      <div class="mode-icon">${m.icon}</div>
+      <div class="lbl">${m.label}</div>
+      <div class="dsc">${m.desc}</div>
+    </div>`).join('');
+}
+function renderCats(){
+  const counts={};
+  PRODUCTS.forEach(p=>{counts[p.category]=(counts[p.category]||0)+1});
+  document.getElementById('cat-grid').innerHTML=CATS.map(c=>`
+    <div class="cat-chip" data-id="${c.id}" onclick="pickCat('${c.id}')">${c.label}<span class="cat-count">${counts[c.id]||0} 件</span></div>`).join('');
+}
+
+function pickSkin(id){
+  selectedSkinTypes.has(id)?selectedSkinTypes.delete(id):selectedSkinTypes.add(id);
+  document.querySelectorAll('.skin-card').forEach(el=>el.classList.toggle('selected',selectedSkinTypes.has(el.dataset.id)));
+  document.getElementById('btn1').disabled=selectedSkinTypes.size===0;
+}
+function pickConcern(id){
+  selectedConcerns.has(id)?selectedConcerns.delete(id):selectedConcerns.add(id);
+  document.querySelectorAll('.concern-pill').forEach(el=>el.classList.toggle('selected',selectedConcerns.has(el.dataset.id)));
+}
+function pickMode(id){
+  selectedMode=id;
+  document.querySelectorAll('.mode-card').forEach(el=>el.classList.toggle('selected',el.dataset.id===id));
+  const cs=document.getElementById('cat-sec');
+  if(id==='single'){cs.style.display='block';document.getElementById('btn2').disabled=!selectedCategory}
+  else{cs.style.display='none';document.getElementById('btn2').disabled=false}
+}
+function pickCat(id){
+  selectedCategory=id;
+  document.querySelectorAll('.cat-chip').forEach(el=>el.classList.toggle('selected',el.dataset.id===id));
+  if(selectedMode==='single')document.getElementById('btn2').disabled=false;
+}
+
+function goToStep(s){
+  currentStep=s;searchQuery='';filterBrand='';
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('sv'+i);
+    el.classList.toggle('active',i===s);
+    el.style.display=i===s?'block':'none';
+  });
+  for(let i=1;i<=3;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.remove('active','done');
+    if(i<s)d.classList.add('done');
+    if(i===s)d.classList.add('active');
+    d.innerHTML=i<s?'✓':`<span>${i}</span>`;
+  }
+  for(let i=1;i<=2;i++)document.getElementById('pl'+i).classList.toggle('done',i<s);
+  if(s===3)renderResults();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function getMatchTargets(){
+  const mt=new Set();
+  // Map skin types to product tag matches
+  if(selectedSkinTypes.has('oily')||selectedSkinTypes.has('combination'))mt.add('oily');
+  if(selectedSkinTypes.has('dry')||selectedSkinTypes.has('combination'))mt.add('dry');
+  if(selectedSkinTypes.has('sensitive'))mt.add('sensitive');
+  if(selectedSkinTypes.has('acne_prone'))mt.add('acne_prone');
+  if(selectedSkinTypes.has('mature'))mt.add('mature');
+  if(selectedSkinTypes.has('dull'))mt.add('dull');
+  return mt;
+}
+
+function getMatching(cat,extra){
+  let list=PRODUCTS.filter(p=>p.stock>0&&(extra?(p.category===cat||p.category===extra):p.category===cat));
+  const mt=getMatchTargets();
+  const ct=selectedConcerns;
+  const scored=list.map(p=>{
+    let s=0;
+    if(p.skinTypes.includes('all'))s+=1;
+    mt.forEach(t=>{if(p.skinTypes.includes(t))s+=3});
+    ct.forEach(c=>{if(p.concerns.includes(c))s+=3});
+    return{...p,score:s};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  return scored;
+}
+
+function getBrands(products){
+  const b={};products.forEach(p=>{b[p.brand]=(b[p.brand]||0)+1});
+  return Object.entries(b).sort((a,b)=>b[1]-a[1]);
+}
+
+function genWhyText(p){
+  const reasons=[];
+  const mt=getMatchTargets();
+  const skinLabels={oily:'油性肌',dry:'乾性肌',sensitive:'敏感肌',acne_prone:'痘痘肌',mature:'熟齡肌',dull:'暗啞肌'};
+  mt.forEach(t=>{if(p.skinTypes.includes(t))reasons.push('適合'+skinLabels[t])});
+  selectedConcerns.forEach(c=>{if(p.concerns.includes(c))reasons.push('針對'+CONCERN_LABELS[c])});
+  return reasons.length?reasons.join('、'):'';
+}
+
+function genDetailedWhy(p){
+  const parts=[];
+  const mt=getMatchTargets();
+  const skinSentences={
+    oily:'這款產品的配方適合油性肌膚，質地清爽不厚重',
+    dry:'這款產品提供深層滋潤，適合乾性肌膚補充水分',
+    sensitive:'配方溫和不刺激，適合敏感肌膚安心使用',
+    acne_prone:'含有針對痘痘肌的成分，有助控制暗瘡',
+    mature:'含抗老成分，有助改善熟齡肌膚的鬆弛問題',
+    dull:'有助提亮膚色，改善暗啞問題'
+  };
+  const concernSentences={
+    oil_control:'有效平衡肌膚油脂分泌',hydration:'為肌膚補充深層水分',
+    acne:'幫助舒緩和預防暗瘡問題',pore:'收細毛孔，令肌膚更細緻',
+    brightening:'提亮膚色，令肌膚回復光澤',dark_spots:'淡化色斑和痘印',
+    fine_lines:'撫平細紋，令肌膚更緊緻',anti_aging:'延緩肌膚老化，保持彈性',
+    soothing:'舒緩及修護受損肌膚',redness:'減少泛紅，強化肌膚屏障',
+    dullness:'改善暗沉，恢復自然光澤',deep_clean:'深入清潔毛孔中的污垢和多餘油脂'
+  };
+  mt.forEach(t=>{if(p.skinTypes.includes(t)&&skinSentences[t])parts.push(skinSentences[t])});
+  selectedConcerns.forEach(c=>{if(p.concerns.includes(c)&&concernSentences[c])parts.push(concernSentences[c])});
+  if(!parts.length&&p.skinTypes.includes('all'))parts.push('這款產品適合各種膚質使用');
+  return parts.length?parts.join('，')+'。':'';
+}
+
+function genSkinAnalysis(){
+  const skins=[...selectedSkinTypes];
+  const concerns=[...selectedConcerns];
+  if(!skins.length)return'';
+
+  // Skin type descriptions
+  const skinInfo={
+    oily:{name:'油性肌膚',analysis:'你的肌膚皮脂分泌較旺盛，容易出現油光、毛孔粗大等問題。',advice:'建議選擇質地清爽、控油效果好的產品，避免過於厚重的乳霜，同時注意保濕平衡，防止因缺水導致的反覆出油。'},
+    dry:{name:'乾性肌膚',analysis:'你的肌膚天然油脂分泌不足，容易感到緊繃、脫皮。',advice:'建議選擇高保濕、滋潤型的產品，含有透明質酸、神經醯胺等鎖水成分，幫助重建肌膚屏障。'},
+    combination:{name:'混合性肌膚',analysis:'你的T字位偏油，面頰偏乾，需要分區護理。',advice:'建議T字位使用控油產品，兩頰加強保濕。選擇質地適中的產品，既能控制油脂又不會令面頰過乾。'},
+    sensitive:{name:'敏感肌膚',analysis:'你的肌膚屏障較脆弱，容易受到外界刺激而泛紅、不適。',advice:'建議優先選擇溫和、無刺激的產品，避免酒精和強酸成分。含積雪草、洋甘菊等舒緩成分的產品會更適合你。'},
+    acne_prone:{name:'痘痘肌',analysis:'你的肌膚容易出現暗瘡、粉刺等問題，毛孔容易堵塞。',advice:'建議選擇含水楊酸、茶樹精油等抗菌消炎成分的產品，注意清潔之餘也要做好保濕，避免過度清潔刺激肌膚。'},
+    mature:{name:'熟齡肌膚',analysis:'你的肌膚開始出現膠原蛋白流失，出現鬆弛和皺紋。',advice:'建議選擇含視黃醇、胜肽、膠原蛋白等抗老成分的產品，加強肌膚緊緻和彈性，同時注重保濕和防曬。'},
+    dull:{name:'暗啞肌膚',analysis:'你的膚色暗沉、缺乏光澤，可能與新陳代謝減慢或角質層過厚有關。',advice:'建議使用含維他命C、菸鹼胺等亮膚成分的產品，定期去角質，加速肌膚更新，恢復自然光澤。'},
+    normal:{name:'中性肌膚',analysis:'你的膚質均衡穩定，是理想的肌膚狀態。',advice:'建議以維持現有狀態為主，做好基礎保濕和防曬，選擇溫和的日常護理產品。'}
+  };
+
+  // Concern descriptions
+  const concernInfo={
+    oil_control:{name:'控油',tip:'控油的關鍵不是去除所有油脂，而是平衡油水比例'},
+    hydration:{name:'保濕補水',tip:'肌膚缺水會引發多種問題，充足的保濕是護膚的基礎'},
+    acne:{name:'暗瘡痘痘',tip:'溫和清潔配合抗菌成分，有助減少痘痘反覆發作'},
+    pore:{name:'毛孔粗大',tip:'定期清潔毛孔配合收斂產品，可以改善毛孔粗大'},
+    brightening:{name:'美白提亮',tip:'堅持使用美白精華配合防曬，效果會更加顯著'},
+    dark_spots:{name:'色斑痘印',tip:'淡斑需要耐心，配合防曬可以防止色素沉澱加深'},
+    fine_lines:{name:'細紋皺紋',tip:'保濕充足能令細紋不那麼明顯，配合抗老精華效果更好'},
+    anti_aging:{name:'抗衰老緊緻',tip:'越早開始抗老護理效果越好，重點在預防'},
+    soothing:{name:'舒緩修護',tip:'受損肌膚需要溫和對待，避免過多活性成分'},
+    redness:{name:'泛紅敏感',tip:'舒緩泛紅需要修復肌膚屏障，減少外界刺激'},
+    dullness:{name:'暗沉提亮',tip:'去角質配合維他命C精華，能有效改善暗沉'},
+    deep_clean:{name:'深層清潔',tip:'每週1-2次深層清潔即可，過度清潔反而傷害肌膚'}
+  };
+
+  // Build analysis text
+  let skinDesc=skins.map(s=>skinInfo[s]).filter(Boolean);
+  let title=skinDesc.map(s=>s.name).join(' + ');
+  let analysisText=skinDesc.map(s=>s.analysis).join('');
+  let adviceText=skinDesc.map(s=>s.advice).join('');
+
+  // Concern tips
+  let tips=concerns.map(c=>concernInfo[c]).filter(Boolean);
+  let tipsHtml=tips.length?`<div class="analysis-tips">${tips.map(t=>`<span class="analysis-tip">💡 ${t.tip}</span>`).join('')}</div>`:'';
+
+  return`<div class="analysis-card">
+    <div class="analysis-icon">🔬</div>
+    <div class="analysis-label">你的肌膚分析</div>
+    <div class="analysis-title">${title}</div>
+    <div class="analysis-body">
+      <p>${analysisText}</p>
+      <p>${adviceText}</p>
+      ${concerns.length?`<p>針對你關注的${tips.map(t=>t.name).join('、')}問題，我們從庫存中精選了最適合你膚質的產品。以下每一款推薦都是根據你的膚質特點和護膚需求配對，務求為你提供最貼合的護膚方案。</p>`:''}
+    </div>
+    ${tipsHtml}
+  </div>`;
+}
+
+function renderResults(){
+  const c=document.getElementById('results');
+  selectedMode==='routine'?renderRoutine(c):renderSingle(c);
+}
+
+function buildSummary(){
+  const skins=[...selectedSkinTypes].map(id=>SKIN_TYPES.find(s=>s.id===id)?.label).filter(Boolean);
+  const cns=[...selectedConcerns].map(id=>CONCERNS.find(c=>c.id===id)?.label).filter(Boolean);
+  let tags=skins.map(s=>`<span class="modal-tag" style="background:var(--surface2);color:var(--text2)">${s}</span>`).join('');
+  tags+=cns.map(c=>`<span class="modal-tag" style="background:var(--gold-glow);color:var(--gold2)">${c}</span>`).join('');
+  return tags?`<div style="display:flex;flex-wrap:wrap;gap:.25rem;justify-content:center;margin-bottom:1.5rem">${tags}</div>`:'';
+}
+
+function renderSingle(c){
+  allFilteredProducts=getMatching(selectedCategory);
+  currentPage=1;
+  const brands=getBrands(allFilteredProducts);
+  const cat=CATS.find(x=>x.id===selectedCategory);
+  c.innerHTML=`
+    <div class="result-hero">
+      <div class="sec-label">推薦結果</div>
+      <h2 class="sec-title">${cat.label}</h2>
+      <p class="sec-desc">為你的膚質精選合適產品</p>
+      ${buildSummary()}
+    </div>
+    ${genSkinAnalysis()}
+    <div class="filter-bar">
+      <label>篩選</label>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" placeholder="搜尋產品名稱…" oninput="filterSearch(this.value)">
+      </div>
+      <select class="filter-select" id="brandFilter" onchange="filterByBrand(this.value)">
+        <option value="">所有品牌</option>
+        ${brands.map(([b,n])=>`<option value="${b}">${b} (${n})</option>`).join('')}
+      </select>
+      <select class="filter-select" onchange="sortProducts(this.value)">
+        <option value="relevance">相關度排序</option>
+        <option value="name">名稱排序</option>
+      </select>
+    </div>
+    <div class="toolbar">
+      <span class="toolbar-count">共 <strong id="rcount">${allFilteredProducts.length}</strong> 件產品</span>
+    </div>
+    <div class="p-grid" id="p-list"></div>
+    <div class="pagination" id="pagination"></div>
+    ${!allFilteredProducts.length?'<div style="text-align:center;padding:3rem;color:var(--text3)">暫無符合條件的產品</div>':''}`;
+  renderPage();
+}
+
+function renderRoutine(c){
+  const skins=[...selectedSkinTypes].map(id=>SKIN_TYPES.find(s=>s.id===id)?.label).filter(Boolean);
+  const cns=[...selectedConcerns].map(id=>CONCERNS.find(x=>x.id===id)?.label).filter(Boolean);
+  const sub=cns.length?`${skins.join('、')} · ${cns.join('、')}`:skins.join('、');
+  let h=`
+    <div class="result-hero">
+      <div class="sec-label">你的專屬方案</div>
+      <h2 class="sec-title">護膚流程推薦</h2>
+      <div class="result-badge"><span class="dot"></span>${sub}</div>
+    </div>${buildSummary()}${genSkinAnalysis()}`;
+  ROUTINE_STEPS.forEach((step,idx)=>{
+    const products=getMatching(step.category,step.extraCategory);
+    const top=products.slice(0,4);
+    if(!top.length)return;
+    h+=`<div class="routine-block" id="rb${step.step}">
+      <div class="routine-head" onclick="toggleBlock(${step.step})">
+        <div class="routine-num">${step.step}</div>
+        <div class="routine-info"><div class="routine-title">${step.title}</div><div class="routine-desc">${step.desc}</div></div>
+        <span class="routine-arrow">▼</span>
+      </div>
+      <div class="routine-products"><div class="p-grid">${renderCards(top)}</div></div>
+    </div>${idx<ROUTINE_STEPS.length-1?'<div class="routine-sep"></div>':''}`;
+  });
+  c.innerHTML=h;
+}
+
+function toggleBlock(s){document.getElementById('rb'+s).classList.toggle('collapsed')}
+
+function renderCards(products){
+  displayedProducts=products;
+  return products.map((p,i)=>{
+    const concerns=p.concerns.filter(c=>c!=='general').map(c=>`<span class="p-badge bg-${c}">${CONCERN_LABELS[c]||c}</span>`).join('');
+    const sl=p.stock<=0?'out':p.stock<=3?'low':'ok';
+    const top=p.score&&p.score>=6;
+    const why=genWhyText(p);
+    return`<div class="p-card" style="animation-delay:${Math.min(i*.04,.6)}s" onclick="showModal(displayedProducts[${i}])">
+      ${top?'<div class="p-match">✦ Best Match</div>':''}
+      <div class="p-badges"><span class="p-cat pc-${p.category}">${p.category}</span>${concerns}</div>
+      <div class="p-brand">${p.brand}</div>
+      <div class="p-name">${highlightSearch(p.name)}</div>
+      <div class="p-desc">${p.description}</div>
+      <div class="p-bottom">
+        ${why?`<span class="p-why">${why}</span>`:'<span></span>'}
+        <span class="p-stock"><span class="p-dot ${sl}"></span>${sl==='low'?'少量':'有貨'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showModal(p){
+  const concerns=p.concerns.filter(c=>c!=='general').map(c=>`<span class="modal-tag bg-${c}">${CONCERN_LABELS[c]||c}</span>`).join('');
+  const cat=`<span class="modal-tag pc-${p.category}">${p.category}</span>`;
+  const why=genWhyText(p);
+  const sl=p.stock<=0?'out':p.stock<=3?'low':'ok';
+  const slTxt=sl==='out'?'暫時缺貨':sl==='low'?`少量存貨（${p.stock}件）`:`有貨（${p.stock}件）`;
+  document.getElementById('modal-content').innerHTML=`
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <div class="modal-brand">${p.brand}</div>
+    <div class="modal-name">${p.name}</div>
+    <div class="modal-desc">${p.description}</div>
+    <div class="modal-tags">${cat}${concerns}</div>
+    <div class="modal-meta">
+      <span><span class="p-dot ${sl}" style="display:inline-block"></span>${slTxt}</span>
+    </div>
+    ${why?`<div class="modal-why"><strong>推薦原因：</strong>${genDetailedWhy(p)||why}</div>`:''}`;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function highlightSearch(t){
+  if(!searchQuery)return t;
+  return t.replace(new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),
+    '<mark style="background:rgba(201,169,110,.3);padding:0 2px;border-radius:2px;color:var(--gold2)">$1</mark>');
+}
+
+function getFilteredProducts(){
+  let products=getMatching(selectedCategory);
+  if(searchQuery)products=products.filter(p=>p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  if(filterBrand)products=products.filter(p=>p.brand===filterBrand);
+  return products;
+}
+function refreshFiltered(){
+  allFilteredProducts=getFilteredProducts();
+  currentPage=1;
+  document.getElementById('rcount').textContent=allFilteredProducts.length;
+  renderPage();
+}
+function filterSearch(q){searchQuery=q;refreshFiltered()}
+function filterByBrand(b){filterBrand=b;refreshFiltered()}
+function sortProducts(by){
+  if(by==='name')allFilteredProducts.sort((a,b)=>a.name.localeCompare(b.name,'zh'));
+  else allFilteredProducts=getFilteredProducts();
+  currentPage=1;renderPage();
+}
+function renderPage(){
+  const total=allFilteredProducts.length;
+  const pages=Math.ceil(total/PAGE_SIZE);
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageItems=allFilteredProducts.slice(start,start+PAGE_SIZE);
+  document.getElementById('p-list').innerHTML=renderCards(pageItems);
+  // Pagination
+  const pg=document.getElementById('pagination');
+  if(!pg||pages<=1){if(pg)pg.innerHTML='';return}
+  let h=`<button class="page-btn nav-arrow" ${currentPage<=1?'disabled':''} onclick="goPage(${currentPage-1})">‹ 上一頁</button>`;
+  const maxShow=5;
+  let startP=Math.max(1,currentPage-Math.floor(maxShow/2));
+  let endP=Math.min(pages,startP+maxShow-1);
+  if(endP-startP<maxShow-1)startP=Math.max(1,endP-maxShow+1);
+  if(startP>1){h+=`<button class="page-btn" onclick="goPage(1)">1</button>`;if(startP>2)h+=`<span class="page-dots">…</span>`}
+  for(let i=startP;i<=endP;i++)h+=`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  if(endP<pages){if(endP<pages-1)h+=`<span class="page-dots">…</span>`;h+=`<button class="page-btn" onclick="goPage(${pages})">${pages}</button>`}
+  h+=`<button class="page-btn nav-arrow" ${currentPage>=pages?'disabled':''} onclick="goPage(${currentPage+1})">下一頁 ›</button>`;
+  pg.innerHTML=h;
+}
+function goPage(p){
+  const pages=Math.ceil(allFilteredProducts.length/PAGE_SIZE);
+  if(p<1||p>pages)return;
+  currentPage=p;renderPage();
+  document.getElementById('p-list').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.nav-btn').forEach((el,i)=>el.classList.toggle('active',i===(tab==='skincare'?0:1)));
+  document.getElementById('page-skincare').classList.toggle('active',tab==='skincare');
+  document.getElementById('page-makeup').classList.toggle('active',tab==='makeup');
+}
+
+function resetAll(){
+  selectedSkinTypes.clear();selectedConcerns.clear();selectedMode=null;selectedCategory=null;searchQuery='';filterBrand='';
+  document.querySelectorAll('.skin-card,.concern-pill,.mode-card,.cat-chip').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('btn1').disabled=true;
+  document.getElementById('btn2').disabled=true;
+  document.getElementById('cat-sec').style.display='none';
+  goToStep(1);
+}
+
+window.addEventListener('scroll',()=>{document.getElementById('scrollTopBtn').classList.toggle('show',window.scrollY>400)});
+init();
+</script>
+</body>
+</html>
