@@ -201,17 +201,43 @@
     .pc-其他{background:var(--surface2);color:var(--text3)}
 
     /* SKIN ANALYSIS CARD */
-    .analysis-card{position:relative;margin-bottom:2rem;padding:1.75rem 1.5rem;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(155,142,196,.04),rgba(212,134,140,.03));border:1px solid rgba(201,169,110,.15);overflow:hidden;animation:analysisIn .8s var(--ease-out) both}
+    .analysis-card{position:relative;margin-bottom:2rem;padding:1.75rem 1.5rem 1.25rem;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(155,142,196,.04),rgba(212,134,140,.03));border:1px solid rgba(201,169,110,.15);overflow:hidden;animation:analysisIn .8s var(--ease-out) both}
     .analysis-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--lavender),var(--gold));background-size:200% 100%;animation:gradientSlide 4s linear infinite}
     @keyframes gradientSlide{0%{background-position:0% 0}100%{background-position:200% 0}}
     @keyframes analysisIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .analysis-icon{width:44px;height:44px;border-radius:14px;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.85rem;border:1px solid rgba(201,169,110,.15)}
-    .analysis-label{font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
-    .analysis-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:.75rem}
-    .analysis-body{font-size:.8rem;color:var(--text2);line-height:1.85;margin-bottom:.75rem}
-    .analysis-body p{margin-bottom:.5rem}
-    .analysis-tips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
-    .analysis-tip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:8px;font-size:.68rem;font-weight:500;background:var(--surface2);color:var(--text2);border:1px solid var(--glass-border)}
+    .analysis-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+    .analysis-icon{width:40px;height:40px;border-radius:12px;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;border:1px solid rgba(201,169,110,.15)}
+    .analysis-header-text{flex:1}
+    .analysis-label{font-size:.55rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.15rem}
+    .analysis-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;color:var(--text);line-height:1.4}
+
+    /* Skin type tags row */
+    .analysis-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem}
+    .analysis-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;border-radius:8px;font-size:.7rem;font-weight:600;background:rgba(201,169,110,.12);color:var(--gold2);border:1px solid rgba(201,169,110,.15)}
+    .analysis-tag .tag-icon{font-size:.75rem}
+
+    /* Diagnostic items */
+    .analysis-items{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1rem}
+    .analysis-item{display:flex;gap:.65rem;align-items:flex-start;padding:.6rem .75rem;border-radius:12px;background:var(--surface);border:1px solid var(--glass-border);transition:all .3s}
+    .analysis-item:hover{border-color:rgba(255,255,255,.1);background:var(--surface2)}
+    .analysis-item-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;margin-top:.05rem}
+    .analysis-item-icon.problem{background:rgba(212,134,140,.12);color:var(--rose2)}
+    .analysis-item-icon.solution{background:rgba(125,174,130,.12);color:var(--sage)}
+    .analysis-item-content{flex:1;min-width:0}
+    .analysis-item-title{font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:.15rem;display:flex;align-items:center;gap:.3rem}
+    .analysis-item-title .arrow{color:var(--gold);font-size:.65rem}
+    .analysis-item-desc{font-size:.68rem;color:var(--text3);line-height:1.5}
+    .analysis-item .highlight{color:var(--gold2);font-weight:600}
+
+    /* Concern badges with tips */
+    .analysis-concerns{display:flex;flex-direction:column;gap:.4rem}
+    .analysis-concern{display:flex;align-items:center;gap:.5rem;padding:.4rem .65rem;border-radius:10px;background:var(--surface);border:1px solid var(--glass-border);font-size:.7rem;color:var(--text2)}
+    .analysis-concern .concern-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0}
+    .analysis-concern .concern-label{font-weight:600;color:var(--text);white-space:nowrap}
+    .analysis-concern .concern-arrow{color:var(--gold);margin:0 .1rem;flex-shrink:0}
+    .analysis-concern .concern-tip{color:var(--text3);font-size:.66rem}
+    .analysis-divider{height:1px;background:linear-gradient(90deg,transparent,var(--glass-border),transparent);margin:.35rem 0}
+    .analysis-footer{font-size:.66rem;color:var(--text3);text-align:center;padding-top:.25rem;line-height:1.5}
 
     /* ROUTINE */
     .routine-block{margin-bottom:1.5rem;position:relative}
@@ -570,54 +596,75 @@ function genSkinAnalysis(){
   const concerns=[...selectedConcerns];
   if(!skins.length)return'';
 
-  // Skin type descriptions
   const skinInfo={
-    oily:{name:'油性肌膚',analysis:'你的肌膚皮脂分泌較旺盛，容易出現油光、毛孔粗大等問題。',advice:'建議選擇質地清爽、控油效果好的產品，避免過於厚重的乳霜，同時注意保濕平衡，防止因缺水導致的反覆出油。'},
-    dry:{name:'乾性肌膚',analysis:'你的肌膚天然油脂分泌不足，容易感到緊繃、脫皮。',advice:'建議選擇高保濕、滋潤型的產品，含有透明質酸、神經醯胺等鎖水成分，幫助重建肌膚屏障。'},
-    combination:{name:'混合性肌膚',analysis:'你的T字位偏油，面頰偏乾，需要分區護理。',advice:'建議T字位使用控油產品，兩頰加強保濕。選擇質地適中的產品，既能控制油脂又不會令面頰過乾。'},
-    sensitive:{name:'敏感肌膚',analysis:'你的肌膚屏障較脆弱，容易受到外界刺激而泛紅、不適。',advice:'建議優先選擇溫和、無刺激的產品，避免酒精和強酸成分。含積雪草、洋甘菊等舒緩成分的產品會更適合你。'},
-    acne_prone:{name:'痘痘肌',analysis:'你的肌膚容易出現暗瘡、粉刺等問題，毛孔容易堵塞。',advice:'建議選擇含水楊酸、茶樹精油等抗菌消炎成分的產品，注意清潔之餘也要做好保濕，避免過度清潔刺激肌膚。'},
-    mature:{name:'熟齡肌膚',analysis:'你的肌膚開始出現膠原蛋白流失，出現鬆弛和皺紋。',advice:'建議選擇含視黃醇、胜肽、膠原蛋白等抗老成分的產品，加強肌膚緊緻和彈性，同時注重保濕和防曬。'},
-    dull:{name:'暗啞肌膚',analysis:'你的膚色暗沉、缺乏光澤，可能與新陳代謝減慢或角質層過厚有關。',advice:'建議使用含維他命C、菸鹼胺等亮膚成分的產品，定期去角質，加速肌膚更新，恢復自然光澤。'},
-    normal:{name:'中性肌膚',analysis:'你的膚質均衡穩定，是理想的肌膚狀態。',advice:'建議以維持現有狀態為主，做好基礎保濕和防曬，選擇溫和的日常護理產品。'}
+    oily:{name:'油性肌膚',icon:'💧',problem:'皮脂分泌旺盛，易出油光',solution:'清爽控油 + 水油平衡',key:'透明質酸、煙酰胺'},
+    dry:{name:'乾性肌膚',icon:'🏜️',problem:'天然油脂不足，容易緊繃脫皮',solution:'深層保濕 + 重建屏障',key:'神經醯胺、角鯊烷'},
+    combination:{name:'混合性肌膚',icon:'⚖️',problem:'T字出油、面頰偏乾',solution:'分區護理，質地適中',key:'水楊酸（T字）、透明質酸（兩頰）'},
+    sensitive:{name:'敏感肌膚',icon:'🌸',problem:'屏障脆弱，易泛紅刺激',solution:'溫和修護 + 避免刺激',key:'積雪草、洋甘菊'},
+    acne_prone:{name:'痘痘肌',icon:'🔴',problem:'毛孔易堵塞，反覆長暗瘡',solution:'抗菌消炎 + 適度清潔',key:'水楊酸、茶樹精油'},
+    mature:{name:'熟齡肌膚',icon:'🌿',problem:'膠原蛋白流失，鬆弛皺紋',solution:'緊緻抗老 + 彈性修復',key:'視黃醇、胜肽'},
+    dull:{name:'暗啞肌膚',icon:'✨',problem:'膚色暗沉，缺乏光澤',solution:'提亮膚色 + 加速更新',key:'維他命C、菸鹼胺'},
+    normal:{name:'中性肌膚',icon:'🌟',problem:'膚質均衡，需維持穩定',solution:'基礎保濕 + 日常防護',key:'溫和保濕成分'}
   };
 
-  // Concern descriptions
   const concernInfo={
-    oil_control:{name:'控油',tip:'控油的關鍵不是去除所有油脂，而是平衡油水比例'},
-    hydration:{name:'保濕補水',tip:'肌膚缺水會引發多種問題，充足的保濕是護膚的基礎'},
-    acne:{name:'暗瘡痘痘',tip:'溫和清潔配合抗菌成分，有助減少痘痘反覆發作'},
-    pore:{name:'毛孔粗大',tip:'定期清潔毛孔配合收斂產品，可以改善毛孔粗大'},
-    brightening:{name:'美白提亮',tip:'堅持使用美白精華配合防曬，效果會更加顯著'},
-    dark_spots:{name:'色斑痘印',tip:'淡斑需要耐心，配合防曬可以防止色素沉澱加深'},
-    fine_lines:{name:'細紋皺紋',tip:'保濕充足能令細紋不那麼明顯，配合抗老精華效果更好'},
-    anti_aging:{name:'抗衰老緊緻',tip:'越早開始抗老護理效果越好，重點在預防'},
-    soothing:{name:'舒緩修護',tip:'受損肌膚需要溫和對待，避免過多活性成分'},
-    redness:{name:'泛紅敏感',tip:'舒緩泛紅需要修復肌膚屏障，減少外界刺激'},
-    dullness:{name:'暗沉提亮',tip:'去角質配合維他命C精華，能有效改善暗沉'},
-    deep_clean:{name:'深層清潔',tip:'每週1-2次深層清潔即可，過度清潔反而傷害肌膚'}
+    oil_control:{name:'控油',icon:'💦',color:'var(--sky)',tip:'平衡油水比例，而非去除所有油脂'},
+    hydration:{name:'保濕補水',icon:'💎',color:'#7ec4b8',tip:'充足保濕是所有護膚的基礎'},
+    acne:{name:'暗瘡痘痘',icon:'🎯',color:'#d08888',tip:'溫和清潔 + 抗菌成分'},
+    pore:{name:'毛孔粗大',icon:'🔍',color:'var(--sky)',tip:'定期清潔 + 收斂產品'},
+    brightening:{name:'美白提亮',icon:'✨',color:'var(--rose)',tip:'美白精華 + 堅持防曬'},
+    dark_spots:{name:'色斑痘印',icon:'🌙',color:'var(--gold)',tip:'淡斑精華 + 防止色素沉澱'},
+    fine_lines:{name:'細紋皺紋',icon:'〰️',color:'var(--lavender)',tip:'保濕充足 + 抗老精華'},
+    anti_aging:{name:'抗衰老緊緻',icon:'⏳',color:'var(--lavender)',tip:'越早護理效果越好'},
+    soothing:{name:'舒緩修護',icon:'🍃',color:'var(--sage)',tip:'溫和對待，減少活性成分'},
+    redness:{name:'泛紅敏感',icon:'🌡️',color:'var(--rose)',tip:'修復屏障 + 減少刺激'},
+    dullness:{name:'暗沉提亮',icon:'🌤️',color:'#c8b84a',tip:'去角質 + 維他命C精華'},
+    deep_clean:{name:'深層清潔',icon:'🫧',color:'var(--sky)',tip:'每週1-2次，避免過度清潔'}
   };
 
-  // Build analysis text
   let skinDesc=skins.map(s=>skinInfo[s]).filter(Boolean);
-  let title=skinDesc.map(s=>s.name).join(' + ');
-  let analysisText=skinDesc.map(s=>s.analysis).join('');
-  let adviceText=skinDesc.map(s=>s.advice).join('');
+  let title=skinDesc.map(s=>s.name).join(' ＋ ');
 
-  // Concern tips
+  // Build skin type diagnostic items
+  let itemsHtml=skinDesc.map(s=>`
+    <div class="analysis-item">
+      <div class="analysis-item-icon problem">⚠</div>
+      <div class="analysis-item-content">
+        <div class="analysis-item-title">${s.problem}</div>
+        <div class="analysis-item-desc"><span class="analysis-item-title"><span class="arrow">→</span> ${s.solution}</span></div>
+        <div class="analysis-item-desc">推薦成分：<span class="highlight">${s.key}</span></div>
+      </div>
+    </div>`).join('');
+
+  // Build concern rows
+  let concernsHtml='';
   let tips=concerns.map(c=>concernInfo[c]).filter(Boolean);
-  let tipsHtml=tips.length?`<div class="analysis-tips">${tips.map(t=>`<span class="analysis-tip">💡 ${t.tip}</span>`).join('')}</div>`:'';
+  if(tips.length){
+    concernsHtml=`<div class="analysis-divider"></div><div class="analysis-concerns">${tips.map(t=>`
+      <div class="analysis-concern">
+        <div class="concern-icon" style="background:${t.color}22;color:${t.color}">${t.icon}</div>
+        <span class="concern-label">${t.name}</span>
+        <span class="concern-arrow">→</span>
+        <span class="concern-tip">${t.tip}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  // Skin type tag pills
+  let tagsHtml=`<div class="analysis-tags">${skinDesc.map(s=>`<span class="analysis-tag"><span class="tag-icon">${s.icon}</span>${s.name}</span>`).join('')}</div>`;
 
   return`<div class="analysis-card">
-    <div class="analysis-icon">🔬</div>
-    <div class="analysis-label">你的肌膚分析</div>
-    <div class="analysis-title">${title}</div>
-    <div class="analysis-body">
-      <p>${analysisText}</p>
-      <p>${adviceText}</p>
-      ${concerns.length?`<p>針對你關注的${tips.map(t=>t.name).join('、')}問題，我們從庫存中精選了最適合你膚質的產品。以下每一款推薦都是根據你的膚質特點和護膚需求配對，務求為你提供最貼合的護膚方案。</p>`:''}
+    <div class="analysis-header">
+      <div class="analysis-icon">🔬</div>
+      <div class="analysis-header-text">
+        <div class="analysis-label">你的肌膚分析</div>
+        <div class="analysis-title">${title}</div>
+      </div>
     </div>
-    ${tipsHtml}
+    ${tagsHtml}
+    <div class="analysis-items">${itemsHtml}</div>
+    ${concernsHtml}
+    <div class="analysis-divider"></div>
+    <div class="analysis-footer">以下產品根據你的膚質和需求智能配對 ✦</div>
   </div>`;
 }
 
