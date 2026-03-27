@@ -88,12 +88,13 @@
     .skin-card .dsc{font-size:.6rem;color:var(--text3);line-height:1.4;position:relative}
 
     /* CONCERN PILLS */
-    .concern-wrap{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:1rem}
-    .concern-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:999px;border:1px solid var(--glass-border);background:var(--surface);font-size:.78rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .3s var(--ease);user-select:none}
-    .concern-pill:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-1px)}
+    .concern-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+    .concern-pill{display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.9rem .5rem;border-radius:14px;border:1px solid var(--glass-border);background:var(--surface);font-size:.85rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .3s var(--ease);user-select:none;text-align:center}
+    .concern-pill:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-2px)}
     .concern-pill.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 20px var(--gold-glow)}
-    .concern-pill .cdot{width:6px;height:6px;border-radius:50%;transition:all .3s}
-    .concern-pill.selected .cdot{background:var(--bg)!important}
+    .concern-pill .concern-emoji{font-size:1.4rem;line-height:1}
+    .concern-pill .cdot{display:none}
+    .concern-pill.selected .cdot{display:none}
 
     /* MODE CARDS */
     .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem}
@@ -285,7 +286,9 @@
       .skin-card .lbl{font-size:.68rem}.skin-card .dsc{font-size:.55rem}
       .mode-grid{grid-template-columns:1fr}
       .p-grid{grid-template-columns:1fr}
-      .concern-pill{padding:.4rem .75rem;font-size:.72rem}
+      .concern-wrap{grid-template-columns:repeat(3,1fr);gap:.5rem}
+      .concern-pill{padding:.7rem .4rem;font-size:.72rem}
+      .concern-pill .concern-emoji{font-size:1.1rem}
       .sec-title{font-size:1.35rem}
       .cat-grid{grid-template-columns:repeat(3,1fr)}
       .btn{padding:.65rem 1.5rem;font-size:.76rem}
@@ -427,18 +430,18 @@ const SKIN_TYPES=[
   {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'🌟'},
 ];
 const CONCERNS=[
-  {id:'oil_control',label:'控油',color:'var(--sky)'},
-  {id:'hydration',label:'保濕補水',color:'#7ec4b8'},
-  {id:'acne',label:'暗瘡痘痘',color:'#d08888'},
-  {id:'pore',label:'毛孔粗大',color:'var(--sky)'},
-  {id:'brightening',label:'美白提亮',color:'var(--rose)'},
-  {id:'dark_spots',label:'色斑痘印',color:'var(--gold)'},
-  {id:'fine_lines',label:'細紋皺紋',color:'var(--lavender)'},
-  {id:'anti_aging',label:'抗衰老緊緻',color:'var(--lavender)'},
-  {id:'soothing',label:'舒緩修護',color:'var(--sage)'},
-  {id:'redness',label:'泛紅敏感',color:'var(--rose)'},
-  {id:'dullness',label:'暗沉提亮',color:'#c8b84a'},
-  {id:'deep_clean',label:'深層清潔',color:'var(--sky)'},
+  {id:'oil_control',label:'控油',color:'var(--sky)',icon:'🫧'},
+  {id:'hydration',label:'保濕補水',color:'#7ec4b8',icon:'💧'},
+  {id:'acne',label:'暗瘡痘痘',color:'#d08888',icon:'🩹'},
+  {id:'pore',label:'毛孔粗大',color:'var(--sky)',icon:'🔬'},
+  {id:'brightening',label:'美白提亮',color:'var(--rose)',icon:'✨'},
+  {id:'dark_spots',label:'色斑痘印',color:'var(--gold)',icon:'🌗'},
+  {id:'fine_lines',label:'細紋皺紋',color:'var(--lavender)',icon:'〰️'},
+  {id:'anti_aging',label:'抗衰老緊緻',color:'var(--lavender)',icon:'⏳'},
+  {id:'soothing',label:'舒緩修護',color:'var(--sage)',icon:'🌿'},
+  {id:'redness',label:'泛紅敏感',color:'var(--rose)',icon:'🌡️'},
+  {id:'dullness',label:'暗沉提亮',color:'#c8b84a',icon:'💡'},
+  {id:'deep_clean',label:'深層清潔',color:'var(--sky)',icon:'🧼'},
 ];
 const CONCERN_LABELS={oil_control:'控油',hydration:'保濕',soothing:'舒緩',brightening:'美白',anti_aging:'抗老',acne:'抗痘',pore:'毛孔',dark_spots:'淡斑',fine_lines:'抗皺',redness:'退紅',dullness:'提亮',deep_clean:'清潔',general:'通用'};
 const MODES=[
@@ -483,7 +486,7 @@ function renderSkins(){
 function renderConcerns(){
   document.getElementById('concern-wrap').innerHTML=CONCERNS.map(c=>`
     <div class="concern-pill" data-id="${c.id}" onclick="pickConcern('${c.id}')">
-      <span class="cdot" style="background:${c.color}"></span>${c.label}
+      <span class="concern-emoji">${c.icon}</span>${c.label}
     </div>`).join('');
 }
 function renderModes(){
