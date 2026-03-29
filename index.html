@@ -6,6 +6,7 @@
   <title>OUJI Beauty Advisor</title>
   <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
   <script src="products.js"></script>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -77,7 +78,7 @@
 
     /* SKIN TYPE CARDS */
     .skin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:3rem}
-    .skin-card{background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);border-radius:var(--radius-lg);padding:1.25rem .75rem 1rem;text-align:center;cursor:pointer;transition:all .4s var(--ease);position:relative;overflow:hidden;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .skin-card{background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);border-radius:var(--radius-lg);padding:1.5rem .75rem 1.25rem;text-align:center;cursor:pointer;transition:all .4s var(--ease);position:relative;overflow:hidden;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
     .skin-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(109,163,181,.1),rgba(168,212,225,.08));opacity:0;transition:opacity .4s}
     .skin-card:hover{border-color:var(--accent-light);transform:translateY(-4px);box-shadow:0 12px 40px rgba(109,163,181,.2)}
     .skin-card:hover::before{opacity:1}
@@ -86,9 +87,11 @@
     .skin-card.selected .skin-check{transform:scale(1);opacity:1}
     .skin-check{position:absolute;top:.4rem;right:.4rem;width:18px;height:18px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;transform:scale(0);opacity:0;transition:all .35s var(--ease-spring)}
     .skin-check svg{width:9px;height:9px}
-    .skin-icon{font-size:2rem;color:var(--accent);margin:0 auto .6rem;display:block;text-align:center;transition:transform .4s var(--ease-spring)}
-    .skin-card:hover .skin-icon{transform:scale(1.15)}
-    .skin-card.selected .skin-icon{color:var(--accent-dark);transform:scale(1.15)}
+    .skin-icon-wrap{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,rgba(109,163,181,.15),rgba(74,137,153,.1));display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;transition:all .4s var(--ease-spring);border:1px solid rgba(109,163,181,.2)}
+    .skin-card:hover .skin-icon-wrap{background:linear-gradient(135deg,rgba(109,163,181,.25),rgba(74,137,153,.18));transform:scale(1.08);border-color:rgba(109,163,181,.35)}
+    .skin-card.selected .skin-icon-wrap{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent)}
+    .skin-icon{font-size:2.2rem;color:var(--accent-dark);display:block;line-height:1}
+    .skin-card.selected .skin-icon{color:#fff}
     .skin-card .lbl{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:.2rem;position:relative}
     .skin-card .dsc{font-size:.7rem;color:var(--text3);line-height:1.4;position:relative}
 
@@ -428,14 +431,14 @@ const VALID_BRANDS=new Set([
 ]);
 
 const SKIN_TYPES=[
-  {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'drop'},
-  {id:'dry',label:'乾性肌膚',desc:'容易乾燥、脫皮',icon:'cloud-slash'},
+  {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'drop-half'},
+  {id:'dry',label:'乾性肌膚',desc:'容易乾燥、脫皮',icon:'wind'},
   {id:'combination',label:'混合性肌膚',desc:'T字出油，面頰偏乾',icon:'scales'},
-  {id:'sensitive',label:'敏感肌膚',desc:'容易泛紅、刺激',icon:'shield'},
+  {id:'sensitive',label:'敏感肌膚',desc:'容易泛紅、刺激',icon:'flower'},
   {id:'acne_prone',label:'痘痘肌',desc:'容易長暗瘡粉刺',icon:'first-aid'},
   {id:'mature',label:'熟齡肌膚',desc:'出現鬆弛、皺紋',icon:'hourglass'},
-  {id:'dull',label:'暗啞肌膚',desc:'膚色暗沉、缺乏光澤',icon:'moon'},
-  {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'star'},
+  {id:'dull',label:'暗啞肌膚',desc:'膚色暗沉、缺乏光澤',icon:'sun-dim'},
+  {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'smiley'},
 ];
 const CONCERNS=[
   {id:'oil_control',label:'控油',color:'var(--sky)',icon:'drop-slash'},
@@ -488,7 +491,7 @@ function renderSkins(){
   document.getElementById('skin-grid').innerHTML=SKIN_TYPES.map(t=>`
     <div class="skin-card" data-id="${t.id}" onclick="pickSkin('${t.id}')">
       <div class="skin-check">${CHK}</div>
-      <i class="ph-thin ph-${t.icon} skin-icon"></i>
+      <div class="skin-icon-wrap"><i class="ph-light ph-${t.icon} skin-icon"></i></div>
       <div class="lbl">${t.label}</div>
       <div class="dsc">${t.desc}</div>
     </div>`).join('');
