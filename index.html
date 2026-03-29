@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OUJI Beauty Advisor</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css">
   <script src="products.js"></script>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -93,7 +94,8 @@
     .concern-pill{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem .5rem;border-radius:14px;border:1px solid var(--glass-border);background:var(--surface);font-size:1rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .3s var(--ease);user-select:none;text-align:center}
     .concern-pill:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-2px)}
     .concern-pill.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 20px var(--gold-glow)}
-    .concern-pill .concern-emoji{font-size:1.4rem;line-height:1}
+    .concern-pill .concern-emoji{font-size:1.8rem;line-height:1;color:var(--gold2)}
+    .concern-pill.selected .concern-emoji{color:var(--bg)}
     .concern-pill .cdot{display:none}
     .concern-pill.selected .cdot{display:none}
 
@@ -119,7 +121,8 @@
     .cat-chip{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.9rem .4rem;border-radius:var(--radius);border:1px solid var(--glass-border);background:var(--surface);text-align:center;cursor:pointer;font-size:.95rem;font-weight:600;color:var(--text2);transition:all .25s var(--ease)}
     .cat-chip:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-2px)}
     .cat-chip.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:700;box-shadow:0 4px 16px var(--gold-glow)}
-    .cat-icon{font-size:1.6rem;line-height:1}
+    .cat-icon{font-size:2rem;line-height:1;color:var(--gold2)}
+    .cat-chip.selected .cat-icon{color:var(--bg)}
     .cat-count{font-size:.7rem;color:var(--text3);margin-top:.1rem;display:block}
     .cat-chip.selected .cat-count{color:rgba(0,0,0,.5)}
 
@@ -432,18 +435,18 @@ const SKIN_TYPES=[
   {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'🌟'},
 ];
 const CONCERNS=[
-  {id:'oil_control',label:'控油',color:'var(--sky)',icon:'🫧'},
-  {id:'hydration',label:'保濕補水',color:'#7ec4b8',icon:'💧'},
-  {id:'acne',label:'暗瘡痘痘',color:'#d08888',icon:'🩹'},
-  {id:'pore',label:'毛孔粗大',color:'var(--sky)',icon:'🔍'},
-  {id:'brightening',label:'美白提亮',color:'var(--rose)',icon:'✨'},
-  {id:'dark_spots',label:'色斑痘印',color:'var(--gold)',icon:'🎯'},
-  {id:'fine_lines',label:'細紋皺紋',color:'var(--lavender)',icon:'🪡'},
-  {id:'anti_aging',label:'抗衰老緊緻',color:'var(--lavender)',icon:'⌛'},
-  {id:'soothing',label:'舒緩修護',color:'var(--sage)',icon:'🌿'},
-  {id:'redness',label:'泛紅敏感',color:'var(--rose)',icon:'🩸'},
-  {id:'dullness',label:'暗沉提亮',color:'#c8b84a',icon:'☀️'},
-  {id:'deep_clean',label:'深層清潔',color:'var(--sky)',icon:'🧼'},
+  {id:'oil_control',label:'控油',color:'var(--sky)',icon:'drop-slash'},
+  {id:'hydration',label:'保濕補水',color:'#7ec4b8',icon:'drop'},
+  {id:'acne',label:'暗瘡痘痘',color:'#d08888',icon:'shield-check'},
+  {id:'pore',label:'毛孔粗大',color:'var(--sky)',icon:'magnifying-glass'},
+  {id:'brightening',label:'美白提亮',color:'var(--rose)',icon:'sparkle'},
+  {id:'dark_spots',label:'色斑痘印',color:'var(--gold)',icon:'circles-three'},
+  {id:'fine_lines',label:'細紋皺紋',color:'var(--lavender)',icon:'wave-sine'},
+  {id:'anti_aging',label:'抗衰老緊緻',color:'var(--lavender)',icon:'hourglass'},
+  {id:'soothing',label:'舒緩修護',color:'var(--sage)',icon:'leaf'},
+  {id:'redness',label:'泛紅敏感',color:'var(--rose)',icon:'thermometer'},
+  {id:'dullness',label:'暗沉提亮',color:'#c8b84a',icon:'sun-horizon'},
+  {id:'deep_clean',label:'深層清潔',color:'var(--sky)',icon:'broom'},
 ];
 const CONCERN_LABELS={oil_control:'控油',hydration:'保濕',soothing:'舒緩',brightening:'美白',anti_aging:'抗老',acne:'抗痘',pore:'毛孔',dark_spots:'淡斑',fine_lines:'抗皺',redness:'退紅',dullness:'提亮',deep_clean:'清潔',general:'通用'};
 const MODES=[
@@ -462,13 +465,13 @@ const ROUTINE_STEPS=[
   {step:9,category:'面膜',title:'面膜（每週2-3次）',desc:'深層滋養修護'},
 ];
 const CATS=[
-  {id:'卸妝',label:'卸妝',icon:'🫧'},{id:'潔面',label:'潔面',icon:'🧼'},
-  {id:'去角質',label:'去角質',icon:'🪨'},{id:'爽膚水',label:'爽膚水',icon:'💧'},
-  {id:'精華液',label:'精華液',icon:'💎'},{id:'眼部護理',label:'眼部護理',icon:'👁️'},
-  {id:'面霜',label:'面霜',icon:'🫙'},{id:'乳液',label:'乳液',icon:'🧴'},
-  {id:'面膜',label:'面膜',icon:'😷'},{id:'防曬',label:'防曬',icon:'🌞'},
-  {id:'噴霧',label:'噴霧',icon:'🫧'},{id:'身體護理',label:'身體護理',icon:'🛁'},
-  {id:'唇部護理',label:'唇部護理',icon:'💄'},{id:'其他',label:'其他',icon:'📦'},
+  {id:'卸妝',label:'卸妝',icon:'drop'},{id:'潔面',label:'潔面',icon:'hand-soap'},
+  {id:'去角質',label:'去角質',icon:'sparkle'},{id:'爽膚水',label:'爽膚水',icon:'droplets'},
+  {id:'精華液',label:'精華液',icon:'eyedropper'},  {id:'眼部護理',label:'眼部護理',icon:'eye'},
+  {id:'面霜',label:'面霜',icon:'jar'},{id:'乳液',label:'乳液',icon:'bottle'},
+  {id:'面膜',label:'面膜',icon:'mask-happy'},{id:'防曬',label:'防曬',icon:'sun'},
+  {id:'噴霧',label:'噴霧',icon:'spray-bottle'},{id:'身體護理',label:'身體護理',icon:'bathtub'},
+  {id:'唇部護理',label:'唇部護理',icon:'heart'},{id:'其他',label:'其他',icon:'package'},
 ];
 const CHK='<svg viewBox="0 0 12 12" fill="none" stroke="#0c0a0e" stroke-width="2.5"><path d="M2.5 6l2.5 2.5 4.5-4.5"/></svg>';
 
@@ -490,7 +493,7 @@ function renderSkins(){
 function renderConcerns(){
   document.getElementById('concern-wrap').innerHTML=CONCERNS.map(c=>`
     <div class="concern-pill" data-id="${c.id}" onclick="pickConcern('${c.id}')">
-      <span class="concern-emoji">${c.icon}</span>${c.label}
+      <i class="ph-thin ph-${c.icon} concern-emoji"></i>${c.label}
     </div>`).join('');
 }
 function renderModes(){
@@ -507,7 +510,7 @@ function renderCats(){
   PRODUCTS.forEach(p=>{counts[p.category]=(counts[p.category]||0)+1});
   document.getElementById('cat-grid').innerHTML=CATS.map(c=>`
     <div class="cat-chip" data-id="${c.id}" onclick="pickCat('${c.id}')">
-      <span class="cat-icon">${c.icon}</span>${c.label}<span class="cat-count">${counts[c.id]||0} 件</span>
+      <i class="ph-thin ph-${c.icon} cat-icon"></i>${c.label}<span class="cat-count">${counts[c.id]||0} 件</span>
     </div>`).join('');
 }
 
