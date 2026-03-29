@@ -18,7 +18,8 @@
       --radius:16px;--radius-lg:24px;
       --ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(0,.55,.45,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
     }
-    html{scroll-behavior:smooth}
+    html{scroll-behavior:smooth;font-size:18px}
+    @media(max-width:480px){html{font-size:16px}}
     body{font-family:'Inter','Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
     /* AMBIENT */
@@ -114,11 +115,12 @@
 
     /* CAT CHIPS */
     .cat-sec{margin-top:2rem}
-    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.4rem;margin-bottom:2rem}
-    .cat-chip{padding:.55rem .4rem;border-radius:var(--radius);border:1px solid var(--glass-border);background:var(--surface);text-align:center;cursor:pointer;font-size:.75rem;font-weight:500;color:var(--text2);transition:all .25s var(--ease)}
-    .cat-chip:hover{border-color:rgba(255,255,255,.15);background:var(--surface2)}
-    .cat-chip.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 16px var(--gold-glow)}
-    .cat-count{font-size:.6rem;color:var(--text3);margin-top:.15rem;display:block}
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.55rem;margin-bottom:2rem}
+    .cat-chip{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.9rem .4rem;border-radius:var(--radius);border:1px solid var(--glass-border);background:var(--surface);text-align:center;cursor:pointer;font-size:.95rem;font-weight:600;color:var(--text2);transition:all .25s var(--ease)}
+    .cat-chip:hover{border-color:rgba(255,255,255,.15);background:var(--surface2);transform:translateY(-2px)}
+    .cat-chip.selected{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:700;box-shadow:0 4px 16px var(--gold-glow)}
+    .cat-icon{font-size:1.6rem;line-height:1}
+    .cat-count{font-size:.7rem;color:var(--text3);margin-top:.1rem;display:block}
     .cat-chip.selected .cat-count{color:rgba(0,0,0,.5)}
 
     /* BUTTONS */
@@ -460,11 +462,13 @@ const ROUTINE_STEPS=[
   {step:9,category:'面膜',title:'面膜（每週2-3次）',desc:'深層滋養修護'},
 ];
 const CATS=[
-  {id:'卸妝',label:'卸妝'},{id:'潔面',label:'潔面'},{id:'去角質',label:'去角質'},
-  {id:'爽膚水',label:'爽膚水'},{id:'精華液',label:'精華液'},{id:'眼部護理',label:'眼部護理'},
-  {id:'面霜',label:'面霜'},{id:'乳液',label:'乳液'},{id:'面膜',label:'面膜'},
-  {id:'防曬',label:'防曬'},{id:'噴霧',label:'噴霧'},{id:'身體護理',label:'身體護理'},
-  {id:'唇部護理',label:'唇部護理'},{id:'其他',label:'其他'},
+  {id:'卸妝',label:'卸妝',icon:'🧴'},{id:'潔面',label:'潔面',icon:'🫧'},
+  {id:'去角質',label:'去角質',icon:'🌾'},{id:'爽膚水',label:'爽膚水',icon:'💦'},
+  {id:'精華液',label:'精華液',icon:'✨'},{id:'眼部護理',label:'眼部護理',icon:'👁️'},
+  {id:'面霜',label:'面霜',icon:'🍯'},{id:'乳液',label:'乳液',icon:'🥛'},
+  {id:'面膜',label:'面膜',icon:'🩵'},{id:'防曬',label:'防曬',icon:'☀️'},
+  {id:'噴霧',label:'噴霧',icon:'💨'},{id:'身體護理',label:'身體護理',icon:'🌸'},
+  {id:'唇部護理',label:'唇部護理',icon:'💋'},{id:'其他',label:'其他',icon:'📦'},
 ];
 const CHK='<svg viewBox="0 0 12 12" fill="none" stroke="#0c0a0e" stroke-width="2.5"><path d="M2.5 6l2.5 2.5 4.5-4.5"/></svg>';
 
@@ -502,7 +506,9 @@ function renderCats(){
   const counts={};
   PRODUCTS.forEach(p=>{counts[p.category]=(counts[p.category]||0)+1});
   document.getElementById('cat-grid').innerHTML=CATS.map(c=>`
-    <div class="cat-chip" data-id="${c.id}" onclick="pickCat('${c.id}')">${c.label}<span class="cat-count">${counts[c.id]||0} 件</span></div>`).join('');
+    <div class="cat-chip" data-id="${c.id}" onclick="pickCat('${c.id}')">
+      <span class="cat-icon">${c.icon}</span>${c.label}<span class="cat-count">${counts[c.id]||0} 件</span>
+    </div>`).join('');
 }
 
 function pickSkin(id){
