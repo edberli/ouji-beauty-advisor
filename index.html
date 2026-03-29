@@ -83,11 +83,11 @@
     .skin-card.selected .skin-check{transform:scale(1);opacity:1}
     .skin-check{position:absolute;top:.4rem;right:.4rem;width:18px;height:18px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;transform:scale(0);opacity:0;transition:all .35s var(--ease-spring)}
     .skin-check svg{width:9px;height:9px}
-    .skin-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:1.1rem;background:var(--surface2);transition:transform .4s var(--ease-spring)}
+    .skin-icon{font-size:2rem;color:var(--gold2);margin:0 auto .6rem;display:block;text-align:center;transition:transform .4s var(--ease-spring)}
     .skin-card:hover .skin-icon{transform:scale(1.1)}
-    .skin-card.selected .skin-icon{background:var(--gold-glow);transform:scale(1.1)}
-    .skin-card .lbl{font-size:.75rem;font-weight:600;color:var(--text);margin-bottom:.15rem;position:relative}
-    .skin-card .dsc{font-size:.6rem;color:var(--text3);line-height:1.4;position:relative}
+    .skin-card.selected .skin-icon{color:var(--gold);transform:scale(1.1)}
+    .skin-card .lbl{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:.2rem;position:relative}
+    .skin-card .dsc{font-size:.7rem;color:var(--text3);line-height:1.4;position:relative}
 
     /* CONCERN PILLS */
     .concern-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
@@ -288,7 +288,7 @@
       .skin-grid{grid-template-columns:repeat(2,1fr);gap:.45rem}
       .skin-card{padding:.85rem .5rem .7rem}
       .skin-icon{width:32px;height:32px;font-size:.9rem}
-      .skin-card .lbl{font-size:.68rem}.skin-card .dsc{font-size:.55rem}
+      .skin-card .lbl{font-size:.8rem}.skin-card .dsc{font-size:.65rem}
       .mode-grid{grid-template-columns:1fr}
       .p-grid{grid-template-columns:1fr}
       .concern-wrap{grid-template-columns:repeat(3,1fr);gap:.5rem}
@@ -425,14 +425,14 @@ const VALID_BRANDS=new Set([
 ]);
 
 const SKIN_TYPES=[
-  {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'💧'},
-  {id:'dry',label:'乾性肌膚',desc:'容易乾燥、脫皮',icon:'🏜️'},
-  {id:'combination',label:'混合性肌膚',desc:'T字出油，面頰偏乾',icon:'⚖️'},
-  {id:'sensitive',label:'敏感肌膚',desc:'容易泛紅、刺激',icon:'🌸'},
-  {id:'acne_prone',label:'痘痘肌',desc:'容易長暗瘡粉刺',icon:'🔴'},
-  {id:'mature',label:'熟齡肌膚',desc:'出現鬆弛、皺紋',icon:'🌿'},
-  {id:'dull',label:'暗啞肌膚',desc:'膚色暗沉、缺乏光澤',icon:'✨'},
-  {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'🌟'},
+  {id:'oily',label:'油性肌膚',desc:'容易出油、毛孔粗大',icon:'drop'},
+  {id:'dry',label:'乾性肌膚',desc:'容易乾燥、脫皮',icon:'cloud-slash'},
+  {id:'combination',label:'混合性肌膚',desc:'T字出油，面頰偏乾',icon:'scales'},
+  {id:'sensitive',label:'敏感肌膚',desc:'容易泛紅、刺激',icon:'shield'},
+  {id:'acne_prone',label:'痘痘肌',desc:'容易長暗瘡粉刺',icon:'first-aid'},
+  {id:'mature',label:'熟齡肌膚',desc:'出現鬆弛、皺紋',icon:'hourglass'},
+  {id:'dull',label:'暗啞肌膚',desc:'膚色暗沉、缺乏光澤',icon:'moon'},
+  {id:'normal',label:'中性肌膚',desc:'膚質均衡穩定',icon:'star'},
 ];
 const CONCERNS=[
   {id:'oil_control',label:'控油',color:'var(--sky)',icon:'drop-slash'},
@@ -465,10 +465,10 @@ const ROUTINE_STEPS=[
   {step:9,category:'面膜',title:'面膜（每週2-3次）',desc:'深層滋養修護'},
 ];
 const CATS=[
-  {id:'卸妝',label:'卸妝',icon:'drop'},{id:'潔面',label:'潔面',icon:'hand-soap'},
-  {id:'去角質',label:'去角質',icon:'sparkle'},{id:'爽膚水',label:'爽膚水',icon:'droplets'},
-  {id:'精華液',label:'精華液',icon:'eyedropper'},  {id:'眼部護理',label:'眼部護理',icon:'eye'},
-  {id:'面霜',label:'面霜',icon:'jar'},{id:'乳液',label:'乳液',icon:'bottle'},
+  {id:'卸妝',label:'卸妝',icon:'drop'},{id:'潔面',label:'潔面',icon:'shower'},
+  {id:'去角質',label:'去角質',icon:'sparkle'},{id:'爽膚水',label:'爽膚水',icon:'waves'},
+  {id:'精華液',label:'精華液',icon:'eyedropper'},{id:'眼部護理',label:'眼部護理',icon:'eye'},
+  {id:'面霜',label:'面霜',icon:'jar'},{id:'乳液',label:'乳液',icon:'flask'},
   {id:'面膜',label:'面膜',icon:'mask-happy'},{id:'防曬',label:'防曬',icon:'sun'},
   {id:'噴霧',label:'噴霧',icon:'spray-bottle'},{id:'身體護理',label:'身體護理',icon:'bathtub'},
   {id:'唇部護理',label:'唇部護理',icon:'heart'},{id:'其他',label:'其他',icon:'package'},
@@ -485,7 +485,7 @@ function renderSkins(){
   document.getElementById('skin-grid').innerHTML=SKIN_TYPES.map(t=>`
     <div class="skin-card" data-id="${t.id}" onclick="pickSkin('${t.id}')">
       <div class="skin-check">${CHK}</div>
-      <div class="skin-icon">${t.icon}</div>
+      <i class="ph-thin ph-${t.icon} skin-icon"></i>
       <div class="lbl">${t.label}</div>
       <div class="dsc">${t.desc}</div>
     </div>`).join('');
