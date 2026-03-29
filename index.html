@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OUJI Beauty Advisor</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css">
   <script src="products.js"></script>
   <style>
@@ -14,19 +14,19 @@
       --surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);--surface3:rgba(255,255,255,.1);
       --glass-border:rgba(255,255,255,.08);
       --text:#f5f0eb;--text2:rgba(255,255,255,.6);--text3:rgba(255,255,255,.35);
-      --gold:#c9a96e;--gold2:#e8d5a8;--gold-glow:rgba(201,169,110,.15);
-      --rose:#d4868c;--rose2:#e8a5aa;--lavender:#9b8ec4;--sage:#7dae82;--sky:#7ba7c2;
+      --gold:#6da3b5;--gold2:#a8d4e1;--gold-glow:rgba(109,163,181,.15);
+      --rose:#d4868c;--rose2:#e8a5aa;--lavender:#9b8ec4;--sage:#7dae82;--sky:#6da3b5;
       --radius:16px;--radius-lg:24px;
       --ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(0,.55,.45,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
     }
     html{scroll-behavior:smooth;font-size:18px}
     @media(max-width:480px){html{font-size:16px}}
-    body{font-family:'Inter','Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    body{font-family:'League Spartan','Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
     /* AMBIENT */
     .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
     .ambient-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.35;animation:orbFloat 20s ease-in-out infinite}
-    .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(201,169,110,.3),transparent 70%);top:-10%;left:-10%;animation-duration:25s}
+    .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(109,163,181,.3),transparent 70%);top:-10%;left:-10%;animation-duration:25s}
     .orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(155,142,196,.25),transparent 70%);top:40%;right:-10%;animation-duration:20s;animation-delay:-5s}
     .orb3{width:350px;height:350px;background:radial-gradient(circle,rgba(212,134,140,.2),transparent 70%);bottom:-5%;left:30%;animation-duration:22s;animation-delay:-10s}
     @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-20px,40px) scale(.95)}}
@@ -38,7 +38,8 @@
     /* HEADER */
     .header{padding:3.5rem 0 2rem;text-align:center}
     .header-line{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.25rem}
-    .header h1{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;letter-spacing:.02em;background:linear-gradient(135deg,var(--gold2),var(--gold),var(--rose2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerText 4s ease-in-out infinite;background-size:200% 200%}
+    .header h1{font-family:'League Spartan',sans-serif;font-size:2.5rem;font-weight:600;letter-spacing:.04em;background:linear-gradient(135deg,var(--gold2),var(--gold),#a8d4e1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerText 4s ease-in-out infinite;background-size:200% 200%}
+    .header h1 .ouji{font-weight:800;letter-spacing:.06em}
     @keyframes shimmerText{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
     .header p{font-size:.88rem;color:var(--text2);margin-top:.5rem;font-weight:300;letter-spacing:.05em}
 
@@ -321,7 +322,7 @@
 <div class="wrap">
   <div class="header"><div class="container">
     <div class="header-line"></div>
-    <h1>OUJI Beauty Advisor</h1>
+    <h1><span class="ouji">OUJI</span> Beauty Advisor</h1>
     <p>智能分析膚質，為你精選最合適的護膚品</p>
   </div></div>
 
